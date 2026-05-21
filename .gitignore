@@ -1,0 +1,8 @@
+# Claude Code / Superpowers local state
+.claude/
+.superpowers/
+
+# R session history
+.Rhistory
+.RData
+.Ruserdata
