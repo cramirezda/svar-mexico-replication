@@ -38,6 +38,22 @@
 \usepackage[colorlinks=true,linkcolor=blue!60!black,
             citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
 
+% --- Anotaciones y control de cambios ---
+% Uso: \todo{comentario}           → nota en margen (fondo naranja)
+%      \todo[inline]{comentario}   → nota dentro del texto (fondo naranja)
+%      \missingfigure{descripción} → placeholder de figura faltante
+% Para desactivar todas las notas al compilar la versión final:
+%   cambiar \usepackage{todonotes} por \usepackage[disable]{todonotes}
+\usepackage[colorinlistoftodos,
+            textwidth=3cm,
+            shadow]{todonotes}
+
+% Comandos personalizados para distinguir tipos de nota:
+\newcommand{\revision}[1]{\todo[color=orange!40]{#1}}          % revisar contenido
+\newcommand{\agregar}[1]{\todo[color=green!40]{#1}}            % agregar algo
+\newcommand{\eliminar}[1]{\todo[color=red!30]{#1}}             % eliminar o recortar
+\newcommand{\pregunta}[1]{\todo[color=blue!20]{#1}}            % pregunta al co-autor
+
 % --- Bibliografía ---
 \usepackage{natbib}
 \bibliographystyle{apalike}
@@ -61,11 +77,16 @@
 % ============================================================
 %  PORTADA
 % ============================================================
+% ── Lista de pendientes (aparece en página propia antes de la portada) ──────────
+\listoftodos[Pendientes y anotaciones]
+\newpage
+
 \begin{titlepage}
 \centering
 \vspace*{2cm}
 
 {\large Instituto Tecnológico Autónomo de México \par}
+\pregunta{¿Va el nombre del curso o seminario en la portada?}
 \vspace{0.5cm}
 {\large Departamento de Economía \par}
 \vspace{3cm}
@@ -154,6 +175,7 @@ trabajo verifica.
 
 La pregunta central es si las conclusiones sobre la transmisión del choque monetario son
 robustas a la elección del esquema de identificación.
+\revision{¿Agregar hipótesis explícita aquí, o dejarlo como pregunta de investigación abierta?}
 El análisis muestra que las tres estrategias convergen cualitativamente en horizontes
 de seis a doce meses.
 La principal diferencia se concentra en la respuesta contemporánea de la inflación,
@@ -285,6 +307,7 @@ opera con rezagos de hasta tres trimestres.
 A pesar de estos avances, la literatura para México no había comparado sistemáticamente
 las tres estrategias de identificación bajo una especificación unificada, hueco que
 \citet{carrilloelizondo2018} cubren y que este trabajo verifica.
+\agregar{¿Conoces papers más recientes sobre PM en México (post-2018) que valga la pena citar aquí para actualizar la revisión?}
 
 % ============================================================
 %  3. DATOS
@@ -338,6 +361,7 @@ México no afecta las condiciones globales, pero sí se ve afectado por ellas
 
 Las fuentes primarias son el Banco de México para las variables domésticas y la
 Reserva Federal de St.\ Louis (FRED) para las variables externas.
+\revision{Verificar números de serie exactos de Banxico para cada variable (INPC subyacente, M2, Cetes 28d) e incluirlos en una nota al pie o apéndice de datos.}
 Se documentan dos diferencias respecto al paper original que no es posible eliminar
 por falta de disponibilidad de datos.
 Primera, la fuente del tipo de cambio real: el Banco de México (SR15997, 49 socios)
@@ -688,6 +712,7 @@ propuesto por \citet{carrilloelizondo2018}: proporciona mayor contenido informat
 que las restricciones de signo simples sin la arbitrariedad implícita en las
 restricciones de exclusión.
 
+\eliminar{Revisar si esta sección de conclusiones es suficientemente larga o si el profesor espera mayor discusión de implicaciones de política monetaria.}
 Quedan fuera del alcance de este trabajo varias extensiones.
 El análisis asume linealidad y parámetros constantes en el tiempo, supuesto que podría
 cuestionarse ante el episodio de la crisis de 2008-2009, que cae dentro de la muestra.
