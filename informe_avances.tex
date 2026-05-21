@@ -1,0 +1,45 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\title{\textbf{Reporte de Avances: Replicación SVAR México}\\ \large Carrillo \& Elizondo (2015/2018)}
+\author{Revisión de Avances y Retos Metodológicos}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Avance: corrección en la estimación del tipo de cambio real (TCR)}
+Tras simular un choque monetario contractivo (una subida no anticipada en la tasa de política), las Funciones de Impulso-Respuesta (IRFs) en los modelos de exclusión de Cholesky sugerían una \textit{depreciación} inicial del Tipo de Cambio Real, un resultado que teóricamente es inverso (se esperaría apreciación ante el aumento del costo del dinero interno).
+
+El problema era un error de sintaxis matemática. En versiones previas, el procesamiento calculaba la tasa de cambio del TCR de forma invertida: $\text{dep\_tcr} = (\log\text{TCR}_{t-1} - \log\text{TCR}_t)\times 1200$.
+Con esta definición, una apreciación real (caída en SR15997) producía un \texttt{dep\_tcr} positivo, invirtiendo la interpretación.
+
+Ahora se calcula:
+$$ \text{dep\_tcr}_t = (\log\text{TCR}_t - \log\text{TCR}_{t-1})\times 1200 $$
+
+Las estimaciones estructurales contemporáneas (a un rezago post-choque) se ajustaron correctamente, capturando el impacto negativo sobre el vector ($\text{dep\_tcr} < 0$), consistente con la apreciación real esperada.
+
+\section{Reto metodológico: identificación vía restricciones de signo}
+El enfoque de Uhlig difiere de Cholesky en que no impone un orden causal rígido entre variables. La implementación sigue cuatro pasos:
+
+\begin{enumerate}
+    \item \textbf{Bootstrap recursivo (Runkle):} Se reestima el VAR miles de veces remuestreando los residuos con reemplazo, preservando la estructura de covarianzas original.
+
+    \item \textbf{Rotaciones ortogonales ($\mathbf{Q}$):} Por cada réplica del bootstrap, se factoriza la matriz de Cholesky $\mathbf{P}$ y se pre-multiplica por matrices ortogonales aleatorias $\mathbf{Q}$, explorando el espacio de impactos contemporáneos compatibles con el modelo.
+
+    \item \textbf{Restricciones de signo estándar:} Se retienen únicamente las rotaciones donde un choque monetario contractivo genera caídas contemporáneas en actividad económica (IGAE) y precios.
+
+    \item \textbf{Cota inferior ($\beta_{lower}$):} Para descartar respuestas de inflación con magnitudes poco realistas, se estima por MCO (errores Newey-West) un umbral sobre la curva de Phillips. El valor estimado es $-0.715$; cualquier simulación con una caída mayor se descarta.
+\end{enumerate}
+
+\section{Agenda inmediata: distribución de Haar}
+Las rotaciones ortogonales del paso 2 se generan mediante la distribución de Haar, implementada algorítmicamente con una factorización QR. Esta distribución garantiza que el muestreo sobre el grupo ortogonal sea uniforme, evitando sesgos en la exploración del espacio de identificación.
+
+La tarea pendiente es documentar con precisión sus propiedades formales y verificar que la implementación actual las satisface.
+
+\end{document}

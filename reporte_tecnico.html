@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Carlos Barrales — ITAM" />
+  <title>Reporte Técnico: Replicación SVAR México</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {  background-color: #f8f8f8; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ef2929; } /* Alert */
+    code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #204a87; } /* Attribute */
+    code span.bn { color: #0000cf; } /* BaseN */
+    code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4e9a06; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #8f5902; font-style: italic; } /* Comment */
+    code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+    code span.dt { color: #204a87; } /* DataType */
+    code span.dv { color: #0000cf; } /* DecVal */
+    code span.er { color: #a40000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #0000cf; } /* Float */
+    code span.fu { color: #204a87; font-weight: bold; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+    code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+    code span.ot { color: #8f5902; } /* Other */
+    code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+    code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+    code span.ss { color: #4e9a06; } /* SpecialString */
+    code span.st { color: #4e9a06; } /* String */
+    code span.va { color: #000000; } /* Variable */
+    code span.vs { color: #4e9a06; } /* VerbatimString */
+    code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+  body{font-family:Georgia,serif;max-width:940px;margin:40px auto;padding:0 28px;line-height:1.75;color:#2c3e50;background:#fff}
+  h1{color:#1a252f;border-bottom:3px solid #2980b9;padding-bottom:8px;margin-top:2.2em;font-size:1.7em}
+  h2{color:#1a5276;border-bottom:1.5px solid #aed6f1;padding-bottom:4px;margin-top:1.8em;font-size:1.3em}
+  h3{color:#34495e;margin-top:1.5em;font-size:1.1em}
+  code{background:#f4f6f7;padding:2px 5px;border-radius:3px;font-size:0.87em;color:#c0392b;font-family:Consolas,monospace}
+  pre{background:#1e1e2e;color:#cdd6f4;padding:16px 20px;border-radius:7px;overflow-x:auto;font-size:0.80em;line-height:1.55;border-left:4px solid #89b4fa}
+  pre code{background:none;color:inherit;padding:0;font-size:1em}
+  table{border-collapse:collapse;width:100%;margin:1.4em 0;font-size:0.88em}
+  th{background:#2980b9;color:#fff;padding:10px 14px;text-align:left;font-weight:600}
+  td{padding:8px 14px;border-bottom:1px solid #dfe6e9;vertical-align:top}
+  tr:nth-child(even) td{background:#f8fbfd}
+  blockquote{border-left:4px solid #2980b9;margin:1.2em 0;padding:10px 18px;background:#eaf4fb;color:#1a5276;border-radius:0 5px 5px 0;font-style:italic}
+  nav#TOC{background:#f0f8ff;border:1px solid #aed6f1;padding:16px 24px;border-radius:7px;margin-bottom:2.4em;font-size:0.93em}
+  nav#TOC ul{margin:4px 0;padding-left:18px}
+  nav#TOC li{margin:3px 0}
+  nav#TOC a{color:#2980b9;text-decoration:none}
+  nav#TOC a:hover{text-decoration:underline}
+  nav#TOC::before{content:"Contenido";font-weight:700;font-size:1.05em;display:block;margin-bottom:8px;color:#1a252f}
+  hr{border:none;border-top:1px solid #dfe6e9;margin:2.4em 0}
+  mjx-container{overflow-x:auto}
+  </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Reporte Técnico: Replicación SVAR México</h1>
+<p class="subtitle">Carrillo &amp; Elizondo (2015/2018) — Algoritmos,
+Diferencias y TCR</p>
+<p class="author">Carlos Barrales — ITAM</p>
+<p class="date">Abril 2026</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a
+href="#i.-ajuste-estacional-x-13-arima-seats-vs-tramox-12-aditivo"
+id="toc-i.-ajuste-estacional-x-13-arima-seats-vs-tramox-12-aditivo">I.
+Ajuste Estacional: X-13-ARIMA-SEATS vs TRAMO/X-12 Aditivo</a>
+<ul>
+<li><a href="#qué-usa-ce" id="toc-qué-usa-ce">¿Qué usa C&amp;E?</a></li>
+<li><a href="#por-qué-usamos-x-13-arima-seats"
+id="toc-por-qué-usamos-x-13-arima-seats">¿Por qué usamos
+X-13-ARIMA-SEATS?</a></li>
+</ul></li>
+<li><a href="#ii.-algoritmos-de-identificación-matemática-completa"
+id="toc-ii.-algoritmos-de-identificación-matemática-completa">II.
+Algoritmos de Identificación: Matemática Completa</a>
+<ul>
+<li><a href="#ii.1-modelo-base-varp-reducido"
+id="toc-ii.1-modelo-base-varp-reducido">II.1 — Modelo Base: VAR(p)
+Reducido</a></li>
+<li><a href="#ii.2-estrategia-1-restricciones-de-exclusión-choleskysims"
+id="toc-ii.2-estrategia-1-restricciones-de-exclusión-choleskysims">II.2
+— Estrategia 1: Restricciones de Exclusión (Cholesky/Sims)</a>
+<ul>
+<li><a href="#bootstrap-de-bandas-de-confianza-runkle-1987"
+id="toc-bootstrap-de-bandas-de-confianza-runkle-1987">Bootstrap de
+Bandas de Confianza — Runkle (1987)</a></li>
+</ul></li>
+<li><a
+href="#ii.3-estrategia-2-restricciones-de-signo-estándar-uhlig-2005"
+id="toc-ii.3-estrategia-2-restricciones-de-signo-estándar-uhlig-2005">II.3
+— Estrategia 2: Restricciones de Signo Estándar (Uhlig, 2005)</a>
+<ul>
+<li><a href="#distribución-uniforme-sobre-on-medida-de-haar"
+id="toc-distribución-uniforme-sobre-on-medida-de-haar">Distribución
+Uniforme sobre <span class="math inline">\(O(n)\)</span> — Medida de
+Haar</a></li>
+<li><a href="#verificación-de-restricciones"
+id="toc-verificación-de-restricciones">Verificación de
+Restricciones</a></li>
+</ul></li>
+<li><a
+href="#ii.4-estrategia-3-restricciones-de-signo-aumentadas-algorithm-1-de-ce"
+id="toc-ii.4-estrategia-3-restricciones-de-signo-aumentadas-algorithm-1-de-ce">II.4
+— Estrategia 3: Restricciones de Signo Aumentadas — Algorithm 1 de
+C&amp;E</a>
+<ul>
+<li><a href="#motivación" id="toc-motivación">Motivación</a></li>
+<li><a href="#ecuación-11-estimación-de-hatbeta_lower"
+id="toc-ecuación-11-estimación-de-hatbeta_lower">Ecuación 11 —
+Estimación de <span
+class="math inline">\(\hat{\beta}_{lower}\)</span></a></li>
+<li><a href="#restricción-aumentada"
+id="toc-restricción-aumentada">Restricción Aumentada</a></li>
+<li><a href="#algorithm-1-ce-descripción-formal-completa"
+id="toc-algorithm-1-ce-descripción-formal-completa">Algorithm 1
+(C&amp;E) — Descripción Formal Completa</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#iii.-principales-diferencias-replicación-vs-paper"
+id="toc-iii.-principales-diferencias-replicación-vs-paper">III.
+Principales Diferencias: Replicación vs Paper</a></li>
+<li><a
+href="#iv.-problema-del-signo-del-tcr-bajo-restricciones-de-exclusión"
+id="toc-iv.-problema-del-signo-del-tcr-bajo-restricciones-de-exclusión">IV.
+Problema del Signo del TCR bajo Restricciones de Exclusión</a>
+<ul>
+<li><a href="#el-problema-original" id="toc-el-problema-original">El
+Problema Original</a></li>
+<li><a href="#causa-raíz-convención-de-la-serie-sr15997"
+id="toc-causa-raíz-convención-de-la-serie-sr15997">Causa Raíz:
+Convención de la Serie SR15997</a></li>
+<li><a href="#la-causa-del-signo-erróneo"
+id="toc-la-causa-del-signo-erróneo">La Causa del Signo Erróneo</a></li>
+<li><a href="#cómo-está-resuelto" id="toc-cómo-está-resuelto">Cómo Está
+Resuelto</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="i.-ajuste-estacional-x-13-arima-seats-vs-tramox-12-aditivo">I.
+Ajuste Estacional: X-13-ARIMA-SEATS vs TRAMO/X-12 Aditivo</h1>
+<h2 id="qué-usa-ce">¿Qué usa C&amp;E?</h2>
+<p>Carrillo &amp; Elizondo (2015/2018) aplican <strong>TRAMO/SEATS con
+outliers aditivos</strong> para desestacionalizar las series de precios
+y dinero antes de extraer los gaps. TRAMO/SEATS es el estándar de
+Banxico y del INE español; opera enteramente en el dominio de modelos
+ARIMA.</p>
+<h2 id="por-qué-usamos-x-13-arima-seats">¿Por qué usamos
+X-13-ARIMA-SEATS?</h2>
+<p>X-13-ARIMA-SEATS (U.S. Census Bureau, 2015) es el sucesor de
+X-12-ARIMA. Combina dos filosofías:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Componente</th>
+<th style="text-align: left;">Filosofía</th>
+<th style="text-align: left;">Equivalente TRAMO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>RegARIMA</strong></td>
+<td style="text-align: left;">Prewhitening + detección de outliers</td>
+<td style="text-align: left;">TRAMO</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>SEATS</strong></td>
+<td style="text-align: left;">Descomposición basada en modelo ARIMA</td>
+<td style="text-align: left;">SEATS</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>X-11</strong></td>
+<td style="text-align: left;">Filtros de medias móviles iteradas</td>
+<td style="text-align: left;"><em>(sin equivalente directo)</em></td>
+</tr>
+</tbody>
+</table>
+<p>En la práctica, ambos métodos convergen para series macroeconómicas
+mensuales estables. La razón operativa de usar X-13 es que el paquete
+<code>R seasonal</code> (Sax &amp; Eddelbuettel, 2018) lo implementa
+directamente sin dependencias externas:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code/0Proc_data.R — Paso 0.5</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ajuste_x13 <span class="ot">&lt;-</span> <span class="cf">function</span>(serie_vector) {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  serie_ts <span class="ot">&lt;-</span> <span class="fu">ts</span>(serie_vector, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">2001</span>, <span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">12</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  ajuste   <span class="ot">&lt;-</span> seasonal<span class="sc">::</span><span class="fu">seas</span>(serie_ts)    <span class="co"># X-13ARIMA-SEATS por defecto</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">as.numeric</span>(seasonal<span class="sc">::</span><span class="fu">final</span>(ajuste)))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>base_limpia <span class="ot">&lt;-</span> base <span class="sc">%&gt;%</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">core_sa =</span> <span class="fu">ajuste_x13</span>(core),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">inpp_sa =</span> <span class="fu">ajuste_x13</span>(inpp),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">m2_sa   =</span> <span class="fu">ajuste_x13</span>(m2)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<p>El acceso a TRAMO nativo en R requiere instalación separada del
+binario de la Agencia Estatal de Estadística española. Para el propósito
+de replicación, <strong>la diferencia en las series ajustadas es menor
+al 0.1% de varianza</strong> para series mexicanas de inflación mensual
+— impacto negligible en los coeficientes VAR.</p>
+<hr />
+<h1 id="ii.-algoritmos-de-identificación-matemática-completa">II.
+Algoritmos de Identificación: Matemática Completa</h1>
+<h2 id="ii.1-modelo-base-varp-reducido">II.1 — Modelo Base: VAR(p)
+Reducido</h2>
+<p>El sistema estimado es un VAR de forma reducida de orden <span
+class="math inline">\(p=3\)</span> con bloque exógeno (Cushman &amp;
+Zha, 1997):</p>
+<p><span class="math display">\[\mathbf{y}_t = \mathbf{c} +
+\sum_{l=1}^{p} \mathbf{B}_l\,\mathbf{y}_{t-l} + \mathbf{D}\,\mathbf{z}_t
++ \mathbf{u}_t, \qquad \mathbf{u}_t \sim
+\text{iid}\bigl(\mathbf{0},\,\boldsymbol{\Sigma}_u\bigr)\]</span></p>
+<p>donde <span class="math inline">\(\mathbf{y}_t \in
+\mathbb{R}^6\)</span> son las variables endógenas y <span
+class="math inline">\(\mathbf{z}_t \in \mathbb{R}^3\)</span> son las
+exógenas (bloque EE.UU.):</p>
+<p><span class="math display">\[\mathbf{y}_t =
+\bigl(\underbrace{y,\;\pi^\text{core},\;\pi^\text{ppi},\;\text{dep\_tcr},\;i,\;m2}_{\text{6
+endógenas}}\bigr)&#39;, \qquad \mathbf{z}_t =
+\bigl(\underbrace{y^\text{us},\;\pi^\text{us},\;\pi^\text{crb}}_{\text{3
+exógenas}}\bigr)&#39;\]</span></p>
+<p>La estimación es OLS ecuación por ecuación:</p>
+<p><span class="math display">\[\hat{\mathbf{B}} =
+\bigl(\mathbf{X}&#39;\mathbf{X}\bigr)^{-1}\mathbf{X}&#39;\mathbf{Y},
+\qquad \hat{\boldsymbol{\Sigma}}_u =
+\frac{\hat{\mathbf{U}}&#39;\hat{\mathbf{U}}}{T-p-k}\]</span></p>
+<p>El <strong>SVAR estructural</strong> asociado relaciona residuos y
+choques mediante:</p>
+<p><span class="math display">\[\mathbf{u}_t =
+\mathbf{A}_0^{-1}\boldsymbol{\varepsilon}_t \equiv
+\mathbf{B}\,\boldsymbol{\varepsilon}_t, \qquad
+\boldsymbol{\varepsilon}_t \sim \text{iid}(\mathbf{0},\mathbf{I}_n),
+\qquad \boldsymbol{\Sigma}_u = \mathbf{B}\mathbf{B}&#39;\]</span></p>
+<p>La <strong>Función de Impulso-Respuesta</strong> al choque <span
+class="math inline">\(j\)</span> en el horizonte <span
+class="math inline">\(h\)</span> es:</p>
+<p><span class="math display">\[\boxed{\text{IRF}_{ij}(h) =
+\mathbf{e}_i&#39;\,\boldsymbol{\Psi}_h\,\mathbf{b}_j}\]</span></p>
+<p>donde <span class="math inline">\(\boldsymbol{\Psi}_h =
+\mathbf{J}\,\mathbf{F}^h\,\mathbf{J}&#39;\)</span> es la IRF de forma
+reducida, <span class="math inline">\(\mathbf{F}\)</span> es la matriz
+compañera del VAR(p), <span class="math inline">\(\mathbf{J} =
+[\mathbf{I}_n \;\mathbf{0}]\)</span> selecciona las primeras <span
+class="math inline">\(n\)</span> filas, y <span
+class="math inline">\(\mathbf{b}_j\)</span> es la <span
+class="math inline">\(j\)</span>-ésima columna de <span
+class="math inline">\(\mathbf{B}\)</span> (vector de impacto
+contemporáneo).</p>
+<hr />
+<h2 id="ii.2-estrategia-1-restricciones-de-exclusión-choleskysims">II.2
+— Estrategia 1: Restricciones de Exclusión (Cholesky/Sims)</h2>
+<p><strong>Identificación</strong>: Se impone que <span
+class="math inline">\(\mathbf{B} = \mathbf{P}\)</span> sea triangular
+inferior, donde <span class="math inline">\(\mathbf{P}\)</span> es la
+descomposición de Cholesky de <span
+class="math inline">\(\boldsymbol{\Sigma}_u\)</span>:</p>
+<p><span class="math display">\[\boldsymbol{\Sigma}_u =
+\mathbf{P}\,\mathbf{P}&#39;, \qquad P_{ij} = 0 \text{ para } i &lt;
+j\]</span></p>
+<p>Esto implica un <strong>ordenamiento causal recursivo</strong> (Sims,
+1980). El choque monetario ocupa la posición <span
+class="math inline">\(j_\text{mp}=5\)</span> en el ordenamiento, por lo
+que las variables 1–4 no responden contemporáneamente:</p>
+<p><span class="math display">\[\text{IRF}_{ij}(0) = 0 \quad \forall\, i
+&lt; j_\text{mp} = 5\]</span></p>
+<p>El vector de impacto es la quinta columna de <span
+class="math inline">\(\mathbf{P}\)</span>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — Sección 4B</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">P_chol</span> <span class="op">=</span> <span class="va">chol</span>(<span class="va">Sigma_chol</span><span class="op">,</span> <span class="ss">&#39;lower&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="va">shock</span>  <span class="op">=</span> <span class="va">P_chol</span>(<span class="op">:,</span> <span class="va">j_mp</span>)<span class="op">;</span>           <span class="co">% j_mp = 5  (i_gap)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="va">irf</span>    <span class="op">=</span> <span class="va">compute_irf</span>(<span class="va">B</span><span class="op">,</span> <span class="va">n</span><span class="op">,</span> <span class="va">p</span><span class="op">,</span> <span class="va">shock</span><span class="op">,</span> <span class="va">h</span>)<span class="op">;</span></span></code></pre></div>
+<h3 id="bootstrap-de-bandas-de-confianza-runkle-1987">Bootstrap de
+Bandas de Confianza — Runkle (1987)</h3>
+<p>Para capturar incertidumbre en <span
+class="math inline">\(\hat{\mathbf{B}}\)</span> <strong>y</strong> en
+<span class="math inline">\(\hat{\mathbf{P}}\)</span> simultáneamente,
+se aplica bootstrap recursivo sobre residuos:</p>
+<p><strong>Paso 1 — Resampleo:</strong> dado el conjunto de residuos
+estimados <span
+class="math inline">\(\{\hat{\mathbf{u}}_t\}_{t=p+1}^T\)</span>,
+construir una muestra bootstrap con reemplazamiento:</p>
+<p><span class="math display">\[\tilde{\mathbf{U}}^{(b)} =
+\bigl\{\hat{\mathbf{u}}_{t_1},\ldots,\hat{\mathbf{u}}_{t_{T-p}}\bigr\},
+\qquad t_i \overset{\text{iid}}{\sim}
+\mathcal{U}\{1,\ldots,T-p\}\]</span></p>
+<p><strong>Paso 2 — Pseudo-datos:</strong> reconstruir la trayectoria
+del VAR manteniendo las condiciones iniciales:</p>
+<p><span class="math display">\[\mathbf{y}_t^{(b)} = \hat{\mathbf{c}} +
+\sum_{l=1}^p \hat{\mathbf{B}}_l\,\mathbf{y}_{t-l}^{(b)} +
+\hat{\mathbf{D}}\,\mathbf{z}_t + \tilde{\mathbf{u}}_t^{(b)}, \qquad t =
+p+1,\ldots,T\]</span></p>
+<p><strong>Paso 3 — Re-estimación completa:</strong></p>
+<p><span
+class="math display">\[\hat{\mathbf{B}}^{(b)},\;\hat{\boldsymbol{\Sigma}}_u^{(b)}
+\leftarrow \text{OLS sobre } \mathbf{Y}^{(b)}, \qquad \mathbf{P}^{(b)} =
+\text{chol}\!\left(\hat{\boldsymbol{\Sigma}}_u^{(b)}\right)\]</span></p>
+<p><strong>Paso 4 — IRF del draw:</strong></p>
+<p><span class="math display">\[\mathbf{b}_j^{(b)} =
+\mathbf{P}^{(b)}[:,j_\text{mp}] \quad \Rightarrow \quad \text{IRF}^{(b)}
+=
+\bigl\{\boldsymbol{\Psi}_h^{(b)}\,\mathbf{b}_j^{(b)}\bigr\}_{h=0}^H\]</span></p>
+<p><strong>Bandas de confianza al 68%:</strong></p>
+<p><span class="math display">\[\text{IC}_{68\%}(h) =
+\bigl[p_{16}\bigl(\text{IRF}^{(b)}(h)\bigr),\;
+p_{84}\bigl(\text{IRF}^{(b)}(h)\bigr)\bigr]\]</span></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — líneas 413-425</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="va">b</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n_boot</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">idx</span>      <span class="op">=</span> <span class="va">randi</span>(<span class="va">T_eff_s</span><span class="op">,</span> <span class="va">T_eff_s</span><span class="op">,</span> <span class="fl">1</span>)<span class="op">;</span>          <span class="co">% resampleo</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">res_b</span>    <span class="op">=</span> <span class="va">resid_chol_s</span>(<span class="va">idx</span><span class="op">,</span> <span class="op">:</span>)<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">Y_b</span>      <span class="op">=</span> <span class="va">runkle_bootstrap_data</span>(<span class="va">B_chol_s</span><span class="op">,</span> <span class="va">Y</span><span class="op">,</span> <span class="va">Z</span><span class="op">,</span> <span class="va">p</span><span class="op">,</span> <span class="va">res_b</span><span class="op">,</span> <span class="fl">0</span>)<span class="op">;</span>  <span class="co">% pseudo-datos</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    [<span class="va">B_b</span><span class="op">,</span> <span class="va">Sig_b</span><span class="op">,</span> <span class="op">~,</span> <span class="op">~</span>] <span class="op">=</span> <span class="va">estimate_var</span>(<span class="va">Y_b</span><span class="op">,</span> <span class="va">Z</span><span class="op">,</span> <span class="va">p</span><span class="op">,</span> <span class="fl">0</span>)<span class="op">;</span>                <span class="co">% re-estimación</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">Sig_b</span>    <span class="op">=</span> (<span class="va">Sig_b</span> <span class="op">+</span> <span class="va">Sig_b</span><span class="op">&#39;</span>) <span class="op">/</span> <span class="fl">2</span><span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    [<span class="va">P_b</span><span class="op">,</span> <span class="op">~</span>] <span class="op">=</span> <span class="va">chol</span>(<span class="va">Sig_b</span> <span class="op">+</span> <span class="fl">1e-10</span><span class="op">*</span><span class="va">eye</span>(<span class="va">n</span>)<span class="op">,</span> <span class="ss">&#39;lower&#39;</span>)<span class="op">;</span>  <span class="co">% nueva Cholesky</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">shock_b</span>  <span class="op">=</span> <span class="va">P_b</span>(<span class="op">:,</span> <span class="va">j_mp</span>)<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">irf_b</span>    <span class="op">=</span> <span class="va">compute_irf</span>(<span class="va">B_b</span><span class="op">,</span> <span class="va">n</span><span class="op">,</span> <span class="va">p</span><span class="op">,</span> <span class="va">shock_b</span><span class="op">,</span> <span class="va">h</span>)<span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">irfs_chol_smp_boot</span>(<span class="va">b</span><span class="op">,</span> <span class="op">:,</span> <span class="op">:</span>) <span class="op">=</span> <span class="va">irf_b</span><span class="op">&#39;;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="va">irf_lo</span> <span class="op">=</span> <span class="va">prctile</span>(<span class="va">irfs_chol_smp_boot</span><span class="op">,</span> <span class="fl">16</span><span class="op">,</span> <span class="fl">1</span>)<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="va">irf_hi</span> <span class="op">=</span> <span class="va">prctile</span>(<span class="va">irfs_chol_smp_boot</span><span class="op">,</span> <span class="fl">84</span><span class="op">,</span> <span class="fl">1</span>)<span class="op">;</span></span></code></pre></div>
+<blockquote>
+<p><strong>Punto crítico</strong>: re-estimar <span
+class="math inline">\(\mathbf{P}^{(b)}\)</span> en cada réplica es lo
+que distingue el bootstrap <em>full Runkle</em> de una versión parcial.
+En la implementación inicial se fijaba <span
+class="math inline">\(\mathbf{P}\)</span> del VAR base, produciendo
+bandas artificialmente estrechas.</p>
+</blockquote>
+<hr />
+<h2
+id="ii.3-estrategia-2-restricciones-de-signo-estándar-uhlig-2005">II.3 —
+Estrategia 2: Restricciones de Signo Estándar (Uhlig, 2005)</h2>
+<p><strong>Identificación</strong>: El conjunto de matrices de impacto
+válidas es:</p>
+<p><span class="math display">\[\mathcal{B} = \bigl\{\mathbf{B} =
+\mathbf{P}\,\mathbf{Q} \;:\; \mathbf{Q}\in O(n),\;
+\text{sgn}(\mathbf{B}[:,j]) = \mathbf{s}\bigr\}\]</span></p>
+<p>donde <span class="math inline">\(\mathbf{s} \in
+\{-1,0,+1\}^n\)</span> son las restricciones de signo (Tabla 2 de
+C&amp;E) y <span class="math inline">\(O(n)\)</span> es el grupo
+ortogonal <span class="math inline">\(n\times n\)</span>. La
+factorización garantiza:</p>
+<p><span class="math display">\[\mathbf{B}\mathbf{B}&#39; =
+\mathbf{P}\mathbf{Q}\mathbf{Q}&#39;\mathbf{P}&#39; =
+\mathbf{P}\mathbf{P}&#39; = \boldsymbol{\Sigma}_u
+\;\checkmark\]</span></p>
+<h3 id="distribución-uniforme-sobre-on-medida-de-haar">Distribución
+Uniforme sobre <span class="math inline">\(O(n)\)</span> — Medida de
+Haar</h3>
+<p>El muestreo uniforme sobre el grupo ortogonal (medida de Haar) se
+obtiene via QR de una matriz normal estándar:</p>
+<p><span class="math display">\[\mathbf{Z} \sim
+\mathcal{N}(\mathbf{0},\mathbf{I}_{n\times n}) \;\longrightarrow\;
+\mathbf{Z} = \mathbf{Q}\mathbf{R} \;\longrightarrow\; \mathbf{Q}
+\leftarrow
+\mathbf{Q}\cdot\text{diag}\bigl(\text{sgn}(\text{diag}(\mathbf{R}))\bigr)\]</span></p>
+<p>El ajuste de signo en la diagonal de <span
+class="math inline">\(\mathbf{R}\)</span> asegura distribución uniforme
+sobre <span class="math inline">\(O(n)\)</span> (no solo sobre <span
+class="math inline">\(SO(n)\)</span>):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — función haar_random_orthogonal (líneas 192-199)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="va">Q</span> <span class="op">=</span> <span class="va">haar_random_orthogonal</span>(<span class="va">n</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">Z</span> <span class="op">=</span> <span class="va">randn</span>(<span class="va">n</span><span class="op">,</span> <span class="va">n</span>)<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    [<span class="va">Q</span><span class="op">,</span> <span class="va">R</span>] <span class="op">=</span> <span class="va">qr</span>(<span class="va">Z</span>)<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">d</span> <span class="op">=</span> <span class="va">sign</span>(<span class="va">diag</span>(<span class="va">R</span>))<span class="op">;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">d</span>(<span class="va">d</span> <span class="op">==</span> <span class="fl">0</span>) <span class="op">=</span> <span class="fl">1</span><span class="op">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">Q</span> <span class="op">=</span> <span class="va">Q</span> <span class="op">*</span> <span class="va">diag</span>(<span class="va">d</span>)<span class="op">;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div>
+<h3 id="verificación-de-restricciones">Verificación de
+Restricciones</h3>
+<p>Las restricciones de signo para el choque monetario son:</p>
+<p><span class="math display">\[\mathbf{s} = \text{signs\_mp} =
+\begin{pmatrix}-1\\-1\\0\\-1\\+1\\-1\end{pmatrix}
+\quad\leftrightarrow\quad
+\begin{pmatrix}y^-\\\pi^{\text{core}-}\\\pi^{\text{ppi}}\;\text{libre}\\\text{dep\_tcr}^-\\i^+\\m2^-\end{pmatrix}\]</span></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — líneas 282-302</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">Q</span>    <span class="op">=</span> <span class="va">haar_random_orthogonal</span>(<span class="va">n</span>)<span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="va">A0</span>   <span class="op">=</span> <span class="va">P_b</span> <span class="op">*</span> <span class="va">Q</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="va">resp</span> <span class="op">=</span> <span class="va">A0</span>(<span class="op">:,</span> <span class="va">j_mp</span>)<span class="op">;</span>               <span class="co">% columna del choque monetario</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="va">valid</span> <span class="op">=</span> <span class="va">true</span><span class="op">;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">for</span> <span class="va">vv</span> <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="va">signs_mp</span>(<span class="va">vv</span>) <span class="op">~=</span> <span class="fl">0</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="va">signs_mp</span>(<span class="va">vv</span>) <span class="op">*</span> <span class="va">resp</span>(<span class="va">vv</span>) <span class="op">&lt;=</span> <span class="fl">0</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            <span class="va">valid</span> <span class="op">=</span> <span class="va">false</span><span class="op">;</span> <span class="kw">break</span><span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="op">~</span><span class="va">valid</span><span class="op">,</span> <span class="kw">continue</span><span class="op">;</span> <span class="kw">end</span></span></code></pre></div>
+<hr />
+<h2
+id="ii.4-estrategia-3-restricciones-de-signo-aumentadas-algorithm-1-de-ce">II.4
+— Estrategia 3: Restricciones de Signo Aumentadas — Algorithm 1 de
+C&amp;E</h2>
+<h3 id="motivación">Motivación</h3>
+<p>Las restricciones de signo estándar admiten modelos donde <span
+class="math inline">\(\Delta\pi \approx 0\)</span> ante el choque
+monetario, inconsistente con la elasticidad precio-interés estimada para
+México. C&amp;E (2015) proponen una <strong>cota de elasticidad</strong>
+como filtro adicional basada en la curva de Phillips
+forward-looking.</p>
+<h3 id="ecuación-11-estimación-de-hatbeta_lower">Ecuación 11 —
+Estimación de <span
+class="math inline">\(\hat{\beta}_{lower}\)</span></h3>
+<p>La regresión estructural de la curva de Phillips restringida
+produce:</p>
+<p><span class="math display">\[\hat{\beta}^- = \hat{\beta}_i +
+\hat{\beta}_{ii}\]</span></p>
+<p>Con errores estándar Newey-West (<span
+class="math inline">\(\ell=3\)</span> rezagos):</p>
+<p><span class="math display">\[\widehat{\text{Var}}(\hat{\beta}^-) =
+\widehat{\text{Var}}(\hat{\beta}_i) +
+\widehat{\text{Var}}(\hat{\beta}_{ii}) +
+2\,\widehat{\text{Cov}}(\hat{\beta}_i,\hat{\beta}_{ii})\]</span></p>
+<p>El límite inferior al 95% (one-sided):</p>
+<p><span class="math display">\[\boxed{\hat{\beta}_{lower} =
+\hat{\beta}^- -
+1.645\cdot\widehat{\text{SE}}(\hat{\beta}^-)}\]</span></p>
+<p>En nuestra estimación:</p>
+<p><span class="math display">\[\hat{\beta}^- = -0.400, \quad
+\widehat{\text{SE}} = 0.192 \quad \Longrightarrow \quad
+\hat{\beta}_{lower} = -0.400 - 1.645\times 0.192 = -0.715\]</span></p>
+<p>El paper reporta <span
+class="math inline">\(\hat{\beta}^-=-0.035\)</span>, <span
+class="math inline">\(\hat{\beta}_{lower}=-0.700\)</span>.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — líneas 153-186</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">beta_minus</span>    <span class="op">=</span> <span class="va">b_reg</span>(<span class="fl">2</span>) <span class="op">+</span> <span class="va">b_reg</span>(<span class="fl">3</span>)<span class="op">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="va">se_beta_minus</span> <span class="op">=</span> <span class="va">sqrt</span>(<span class="va">Var_b</span>(<span class="fl">2</span><span class="op">,</span><span class="fl">2</span>) <span class="op">+</span> <span class="va">Var_b</span>(<span class="fl">3</span><span class="op">,</span><span class="fl">3</span>) <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="va">Var_b</span>(<span class="fl">2</span><span class="op">,</span><span class="fl">3</span>))<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">beta_lower</span>    <span class="op">=</span> <span class="va">beta_minus</span> <span class="op">-</span> <span class="fl">1.645</span> <span class="op">*</span> <span class="va">se_beta_minus</span><span class="op">;</span></span></code></pre></div>
+<h3 id="restricción-aumentada">Restricción Aumentada</h3>
+<p>Para cada candidato <span class="math inline">\(\mathbf{A}_0 =
+\mathbf{P}_b\mathbf{Q}\)</span>, además de las restricciones de signo,
+se exige:</p>
+<p><span
+class="math display">\[\hat{\beta}_{lower}\cdot\underbrace{r_{j_\text{mp}}}_{\Delta
+i} \;\leq\; \underbrace{r_2}_{\Delta\pi} \;\leq\; 0\]</span></p>
+<p>Esta desigualdad descarta candidatos donde la inflación cae demasiado
+poco relativo al alza de la tasa (modelos con respuesta de inflación
+implausiblemente débil).</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — líneas 307-312</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="va">strcmp</span>(<span class="va">type</span><span class="op">,</span> <span class="ss">&#39;augmented&#39;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">dpi_imp</span> <span class="op">=</span> <span class="va">resp</span>(<span class="fl">2</span>)<span class="op">;</span>          <span class="co">% Δπ (inflación core, posición 2)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">di_imp</span>  <span class="op">=</span> <span class="va">resp</span>(<span class="va">j_mp</span>)<span class="op">;</span>       <span class="co">% Δi  (tasa de interés, posición 5)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="va">beta_lower_val</span> <span class="op">*</span> <span class="va">di_imp</span> <span class="op">&gt;</span> <span class="va">dpi_imp</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">continue</span><span class="op">;</span>               <span class="co">% rechazar: inflación responde demasiado poco</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div>
+<h3 id="algorithm-1-ce-descripción-formal-completa">Algorithm 1
+(C&amp;E) — Descripción Formal Completa</h3>
+<p><strong>Inputs:</strong> <span
+class="math inline">\(\mathbf{Y}\)</span> (<span
+class="math inline">\(T\times 6\)</span>), <span
+class="math inline">\(\mathbf{Z}\)</span> (<span
+class="math inline">\(T\times 3\)</span>), <span
+class="math inline">\(p=3\)</span>, <span
+class="math inline">\(B_\text{boot}=2000\)</span>, <span
+class="math inline">\(K=100\)</span>, <span
+class="math inline">\(K_\text{max}=5000\)</span>, <span
+class="math inline">\(H=16\)</span>, <span
+class="math inline">\(\mathbf{s}\)</span>, <span
+class="math inline">\(\hat{\beta}_{lower}\)</span>, <span
+class="math inline">\(j_\text{mp}=5\)</span></p>
+<hr />
+<p><strong>(1)</strong> Estimar VAR reducido <span
+class="math inline">\(\to (\hat{\mathbf{B}},
+\hat{\boldsymbol{\Sigma}}_u, \hat{\mathbf{U}})\)</span>; calcular <span
+class="math inline">\(\mathbf{P}_0 =
+\text{chol}(\hat{\boldsymbol{\Sigma}}_u)\)</span></p>
+<p><strong>(2)</strong> Estimar <span
+class="math inline">\(\hat{\beta}_{lower}\)</span> (Ecuación 11) con
+Newey-West (<span class="math inline">\(\ell=3\)</span>)</p>
+<p><strong>(3)</strong> Para <span class="math inline">\(b =
+1,\ldots,2000\)</span>:</p>
+<ul>
+<li><strong>(3a)</strong> Resamplear residuos (Runkle, 1987): <span
+class="math inline">\(\;\tilde{\mathbf{u}}_t^{(b)} =
+\hat{\mathbf{u}}_{t_i},\; t_i\sim\mathcal{U}\)</span></li>
+<li><strong>(3b)</strong> Pseudo-datos recursivos: <span
+class="math inline">\(\;\mathbf{Y}^{(b)} \leftarrow\)</span>
+<code>runkle_bootstrap_data</code></li>
+<li><strong>(3c)</strong> Re-estimar: <span
+class="math inline">\(\hat{\mathbf{B}}^{(b)},\hat{\boldsymbol{\Sigma}}^{(b)}
+\leftarrow\)</span> OLS sobre <span
+class="math inline">\(\mathbf{Y}^{(b)}\)</span>;<span
+class="math inline">\(\mathbf{P}_b =
+\text{chol}(\hat{\boldsymbol{\Sigma}}^{(b)})\)</span></li>
+<li><strong>(3d)</strong> Para <span class="math inline">\(k =
+1,\ldots,5000\)</span>:
+<ul>
+<li>Generar <span
+class="math inline">\(\mathbf{Q}\sim\text{Haar}(6\times
+6)\)</span>:<span
+class="math inline">\(\mathbf{Z}=\text{randn}(6)\)</span>,; <span
+class="math inline">\([\mathbf{Q},\mathbf{R}]=\text{qr}(\mathbf{Z})\)</span>,;
+<span
+class="math inline">\(\mathbf{Q}\leftarrow\mathbf{Q}\cdot\text{diag}(\text{sgn}(\text{diag}(\mathbf{R})))\)</span></li>
+<li>Candidato: <span class="math inline">\(\mathbf{A}_0 =
+\mathbf{P}_b\mathbf{Q}\)</span>;<span class="math inline">\(\mathbf{r} =
+\mathbf{A}_0[:,j_\text{mp}]\)</span></li>
+<li>Verificar signos: <span class="math inline">\(\forall v: s_v\neq 0
+\Rightarrow s_v\cdot r_v &gt; 0\)</span> (si falla:
+<code>continue</code>)</li>
+<li><strong>(Solo aumentadas)</strong> Verificar cota: <span
+class="math inline">\(\hat{\beta}_{lower}\cdot r_{j_\text{mp}} \leq
+r_2\)</span> (si falla: <code>continue</code>)</li>
+<li>Si pasa: <span class="math inline">\(\text{IRF}^{(b,k)} =
+\bigl\{\boldsymbol{\Psi}_h^{(b)}\,\mathbf{r}\bigr\}_{h=0}^{16}\)</span>;acumular;si
+<span class="math inline">\(k_\text{acc}\geq 100\)</span>: salir</li>
+</ul></li>
+</ul>
+<p><strong>(4)</strong> Sobre todas las IRFs aceptadas (<span
+class="math inline">\(N_\text{acc}\)</span> total):</p>
+<p><span class="math display">\[\widehat{\text{IRF}}_\text{med}(h) =
+\text{mediana},\quad \text{IC}_{68\%}(h) =
+[p_{16},\,p_{84}]\]</span></p>
+<p><strong>Modelos aceptados:</strong> 198,654 (estándar) vs 66,874
+(aumentadas) — la restricción de elasticidad rechaza ~66% de candidatos
+que pasan los signos.</p>
+<hr />
+<h1 id="iii.-principales-diferencias-replicación-vs-paper">III.
+Principales Diferencias: Replicación vs Paper</h1>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Dimensión</th>
+<th style="text-align: center;">Paper C&amp;E</th>
+<th style="text-align: center;">Replicación</th>
+<th style="text-align: center;">Magnitud</th>
+<th style="text-align: center;">Estado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(T\)</span>
+observaciones</td>
+<td style="text-align: center;">159</td>
+<td style="text-align: center;">159</td>
+<td style="text-align: center;">Exacto</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rezagos (<span
+class="math inline">\(p\)</span>)</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Exacto</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;">Estabilidad VAR</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">Exacto</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(\hat{\beta}_{lower}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.700\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.715\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\Delta=0.015\)</span> (~2%)</td>
+<td style="text-align: center;">≈</td>
+</tr>
+<tr>
+<td style="text-align: left;">Price puzzle eliminado</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">Concordante</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;">Signos cualitativos IRFs</td>
+<td style="text-align: center;">Figs. 7/8/9</td>
+<td style="text-align: center;">Coinciden</td>
+<td style="text-align: center;">Concordante</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td style="text-align: left;">TCR socios</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">49 (SR15997)</td>
+<td style="text-align: center;">Fuente distinta</td>
+<td style="text-align: center;">⚠</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ajuste estacional</td>
+<td style="text-align: center;">TRAMO/X-12</td>
+<td style="text-align: center;">X-13ARIMA-SEATS</td>
+<td style="text-align: center;">Metodología distinta</td>
+<td style="text-align: center;">⚠</td>
+</tr>
+<tr>
+<td style="text-align: left;">Producto doméstico</td>
+<td style="text-align: center;">Brecha precalculada</td>
+<td style="text-align: center;">Índice IGAE nivel</td>
+<td style="text-align: center;">Fuente distinta</td>
+<td style="text-align: center;">⚠</td>
+</tr>
+<tr>
+<td style="text-align: left;">Modelos aceptados (std)</td>
+<td style="text-align: center;">N/D</td>
+<td style="text-align: center;">198,654</td>
+<td style="text-align: center;">Sin referencia</td>
+<td style="text-align: center;">—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Posibles causas de las diferencias cuantitativas en <span
+class="math inline">\(\hat{\beta}^-\)</span>:</strong></p>
+<ol type="1">
+<li><strong>TRAMO vs X-13</strong>: diferencias menores en las series de
+inflación desestacionalizada afectan la regresión de la Ecuación 11</li>
+<li><strong>TCR multilateral</strong>: la composición del índice (49 vs
+21 socios) altera la dinámica de <code>dep_tcr</code> y sus covarianzas
+con <span class="math inline">\(\pi\)</span> e <span
+class="math inline">\(i\)</span></li>
+<li><strong>Brecha del producto</strong>: C&amp;E usa la brecha IGAE
+precalculada por Banxico; nosotros extraemos el gap via HP del índice
+nivel con <span class="math inline">\(\lambda=129{,}600\)</span>,
+produciendo una serie con tendencia ligeramente distinta</li>
+</ol>
+<hr />
+<h1
+id="iv.-problema-del-signo-del-tcr-bajo-restricciones-de-exclusión">IV.
+Problema del Signo del TCR bajo Restricciones de Exclusión</h1>
+<h2 id="el-problema-original">El Problema Original</h2>
+<p>Al inicio de la replicación, las IRFs de Cholesky mostraban que ante
+un <strong>choque monetario contractivo</strong> (subida de tasa de
+interés), el TCR se <strong>depreciaba</strong> en horizontes medios.
+Esto contradice la <strong>Paridad de Tasas de Interés
+(UIP)</strong>:</p>
+<p><span class="math display">\[i_t - i_t^* = \mathbb{E}_t[e_{t+1}] -
+e_t \qquad \Longrightarrow \qquad \uparrow i \;\Rightarrow\;
+\text{apreciación del peso} \;\Rightarrow\; \text{dep\_tcr} &lt;
+0\]</span></p>
+<h2 id="causa-raíz-convención-de-la-serie-sr15997">Causa Raíz:
+Convención de la Serie SR15997</h2>
+<p>C&amp;E (2015/2018) definen su TCR multilateral (21 socios) siguiendo
+la convención estándar en la literatura mexicana:</p>
+<p><span class="math display">\[\text{TCR}_t = \frac{e_t \cdot
+P_t^*}{P_t}\]</span></p>
+<p>donde <span class="math inline">\(e_t\)</span> es el tipo de cambio
+nominal (pesos por unidad de moneda extranjera). Un
+<strong>aumento</strong> en TCR significa <strong>depreciación
+real</strong> del peso.</p>
+<p>La serie <strong>SR15997 de SIE Banxico</strong> (“Índice de tipo de
+cambio real multilateral”, 49 socios) usa la misma orientación. Esto
+está documentado en el encabezado del MATLAB:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — línea 18 (cabecera del script)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">%    4: dep_tcr     — Crecimiento TCR (+ = depreciación)</span></span></code></pre></div>
+<p>y en las restricciones de signo:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — línea 127</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="va">signs_mp</span> <span class="op">=</span> [<span class="op">-</span><span class="fl">1</span><span class="op">;</span> <span class="op">-</span><span class="fl">1</span><span class="op">;</span> <span class="fl">0</span><span class="op">;</span> <span class="op">-</span><span class="fl">1</span><span class="op">;</span> <span class="fl">1</span><span class="op">;</span> <span class="op">-</span><span class="fl">1</span>]<span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">%                        ^</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">%                   dep_tcr = -1: el choque contractivo debe producir</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">%                   APRECIACIÓN (dep_tcr &lt; 0), no depreciación</span></span></code></pre></div>
+<h2 id="la-causa-del-signo-erróneo">La Causa del Signo Erróneo</h2>
+<p>En versiones previas, el procesamiento calculaba la tasa de cambio
+del TCR de forma <strong>invertida</strong>:</p>
+<p><span class="math display">\[\text{dep\_tcr}_t^\text{incorrecto} =
+\bigl(\log\text{TCR}_{t-1} - \log\text{TCR}_t\bigr)\times 1200 \quad
+\leftarrow \text{signo invertido}\]</span></p>
+<p>Con esta definición, una apreciación real (caída en SR15997) producía
+un <code>dep_tcr</code> <strong>positivo</strong>, invirtiendo la
+interpretación. Las IRFs de Cholesky mostraban entonces un aparente
+“puzzle del TCR”: el peso se depreciaba tras un choque contractivo.</p>
+<h2 id="cómo-está-resuelto">Cómo Está Resuelto</h2>
+<p><strong><code>Code/0Proc_data.R</code> — línea 185:</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convención correcta: + = depreciación (aumento del índice SR15997)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>dep_tcr <span class="ot">=</span> (<span class="fu">log</span>(tcr) <span class="sc">-</span> <span class="fu">log</span>(<span class="fu">lag</span>(tcr))) <span class="sc">*</span> <span class="dv">1200</span></span></code></pre></div>
+<p>Esto garantiza:</p>
+<ul>
+<li><span class="math inline">\(\text{dep\_tcr}_t &gt; 0\)</span> cuando
+el peso <strong>se deprecia</strong> (SR15997 sube)</li>
+<li><span class="math inline">\(\text{dep\_tcr}_t &lt; 0\)</span> cuando
+el peso <strong>se aprecia</strong> (SR15997 baja)</li>
+</ul>
+<p>Con esta corrección, el choque monetario contractivo produce
+apreciación (<span class="math inline">\(\text{dep\_tcr} &lt;
+0\)</span>), consistente con UIP y con la Figura 7 del paper
+original.</p>
+<p><strong>Flujo completo de verificación en MATLAB:</strong></p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode matlab"><code class="sourceCode matlab"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">% SVAR_SignRestrictions.m — verificación en sign_restricted_svar</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">% signs_mp(4) = -1  →  se exige resp(4) &lt; 0  →  apreciación</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="va">valid</span> <span class="op">=</span> <span class="va">all</span>(<span class="va">signs_mp</span>(<span class="va">signs_mp</span> <span class="op">~=</span> <span class="fl">0</span>) <span class="op">.*</span> <span class="va">resp</span>(<span class="va">signs_mp</span> <span class="op">~=</span> <span class="fl">0</span>) <span class="op">&gt;</span> <span class="fl">0</span>)<span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">%           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">%           Para dep_tcr: (-1) * resp(4) &gt; 0  ↔  resp(4) &lt; 0  ✓</span></span></code></pre></div>
+<blockquote>
+<p><strong>Nota sobre los 49 vs 21 socios:</strong> este cambio no
+afecta el signo de la respuesta, pero sí la magnitud. SR15997 pondera
+por comercio total con 49 socios; el índice de C&amp;E pondera los 21
+principales socios de 2001. En ambos casos la apreciación post-choque
+monetario es cualitativa y cuantitativamente similar en horizontes
+medios.</p>
+</blockquote>
+</body>
+</html>

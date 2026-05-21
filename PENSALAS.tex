@@ -1,0 +1,391 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={JIJOMAO},
+  pdfauthor={Carlos Fernando Ramírez Dávila},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{JIJOMAO}
+\author{Carlos Fernando Ramírez Dávila}
+\date{2026-04-06}
+
+\begin{document}
+\maketitle
+
+\begin{enumerate}
+\def\labelenumi{\Roman{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Algoritmos de Identificación: Matemática Completa
+\end{enumerate}
+
+II.1 --- Modelo base: VAR(p) reducido
+
+El sistema estimado es un VAR de forma reducida de orden \(p=3\) con
+bloque exógeno (Cushman \& Zha, 1997):
+
+\[\mathbf{y}t = \mathbf{c} + \sum{l=1}^{p} \mathbf{B}l,\mathbf{y}{t-l} + \mathbf{D},\mathbf{z}_t + \mathbf{u}_t, \qquad \mathbf{u}_t \sim
+  \text{iid}\bigl(\mathbf{0},,\boldsymbol{\Sigma}_u\bigr)\]
+
+donde \(\mathbf{y}_t \in \mathbb{R}^6\) son las variables endógenas y
+\(\mathbf{z}_t \in \mathbb{R}^3\) son las exógenas (bloque EE.UU.). La
+estimación es OLS\\
+ecuación por ecuación (B = (X'X)(X'Y) --- línea 99 del MATLAB).
+
+El SVAR estructural asociado es:
+
+\[\mathbf{A}_0,\mathbf{y}t = \tilde{\mathbf{c}} + \sum{l=1}^{p}\mathbf{A}l,\mathbf{y}{t-l} + \boldsymbol{\varepsilon}_t, \qquad \boldsymbol{\varepsilon}_t \sim   
+  \text{iid}(\mathbf{0},,\mathbf{I}_n)\]
+
+La relación entre formas es
+\(\mathbf{u}_t = \mathbf{A}_0^{-1}\boldsymbol{\varepsilon}_t\), por lo
+que:
+
+\[\boldsymbol{\Sigma}_u = \mathbf{A}_0^{-1}\bigl(\mathbf{A}_0^{-1}\bigr)' \equiv \mathbf{B},\mathbf{B}', \qquad \mathbf{B} \equiv \mathbf{A}_0^{-1}\]
+
+La función de impulso-respuesta al shock \(j\) en el horizonte \(h\) es:
+
+\[\text{IRF}_{ij}(h) = \mathbf{e}_i',\boldsymbol{\Psi}_h,\mathbf{b}_j\]
+
+donde \(\boldsymbol{\Psi}_h = \mathbf{J},\mathbf{F}^h,\mathbf{J}'\) es
+la IRF de forma reducida, \(\mathbf{F}\) es la matriz compañera del VAR,
+\(\mathbf{J}\) selecciona las primeras \(n\) filas, y \(\mathbf{b}_j\)
+es la \(j\)-ésima columna de \(\mathbf{B}\) (vector de impacto).
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 0\tabcolsep) * \real{0.0556}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+II.2 --- Estrategia 1: Restricciones de Exclusión (Cholesky/Sims)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+II.3 --- Estrategia 2: Restricciones de Signo Estándar (Uhlig, 2005) \\
+Identificación: El conjunto de matrices de impacto válidas es \\
+\(\mathcal{B} = \bigl{\mathbf{B} = \mathbf{P},\mathbf{Q} : \mathbf{Q}\in O(n),; \text{sgn}(\mathbf{b}_j) = \mathbf{s}\bigr}\) \\
+donde \(\mathbf{s} \in {-1,0,+1}^n\) son las restricciones de signo
+(Tabla 2 de C\&E) y \(O(n)\) es el grupo ortogonal. La factorización
+\(\mathbf{P}\mathbf{Q}(\mathbf{P}\mathbf{Q})' = \mathbf{P}\mathbf{Q}\mathbf{Q}'\mathbf{P}' = \boldsymbol{\Sigma}_u\)
+garantiza que todas las rotaciones son igualmente admisibles en términos
+de la forma reducida. \\
+Distribución uniforme sobre \(O(n)\) --- medida de Haar: Se genera
+\(\mathbf{Q}\) muestreando uniformemente sobre \(O(n)\) via
+descomposición QR de una matriz normal aleatoria: \\
+\(\mathbf{Z} \sim \mathcal{N}(\mathbf{0},\mathbf{I}_{n\times n}) \quad \Rightarrow \quad \mathbf{Z} = \mathbf{Q},\mathbf{R} \quad \Rightarrow \quad \mathbf{Q}
+\leftarrow \mathbf{Q}\cdot\text{diag}\bigl(\text{sgn}(\text{diag}(\mathbf{R}))\bigr)\) \\
+El ajuste de signo en la última línea asegura distribución uniforme
+sobre \(O(n)\) (no solo sobre \(SO(n)\)) --- ver función
+haar\_random\_orthogonal en SVAR\_SignRestrictions.m líneas 192--199. \\
+\% SVAR\_SignRestrictions.m --- líneas 282-302 Q =
+haar\_random\_orthogonal(n); \% {[}Q,R{]}=qr(randn(n));
+Q=Q\emph{diag(sign(diag(R))) A0 = P\_b } Q; resp = A0(:, j\_mp); \%
+impacto contemporáneo al choque j \\
+valid = true; for vv = 1:n if signs\_mp(vv) \textasciitilde= 0 if
+signs\_mp(vv) * resp(vv) \textless= 0 valid = false; break; end end end
+if \textasciitilde valid, continue; end \\
+Las restricciones impuestas para el choque monetario son (signs\_mp =
+{[}-1;-1;0;-1;+1;-1{]}): \\
+┌──────────────────────────────┬───────┬──────────────────────────────────────────┐
+│ Variable │ Signo │ Razón económica │
+├──────────────────────────────┼───────┼──────────────────────────────────────────┤
+│ Output (\(y\)) │ \(-\) │ Choque contractivo reduce actividad │
+├──────────────────────────────┼───────┼──────────────────────────────────────────┤
+│ Inflación subyacente (\(\pi\)) │ \(-\) │ Price puzzle eliminado por
+construcción │
+├──────────────────────────────┼───────┼──────────────────────────────────────────┤
+│ PPI (\(\pi^\text{ppi}\)) │ libre │ Incertidumbre en transmisión │
+├──────────────────────────────┼───────┼──────────────────────────────────────────┤
+│ Dep. TCR │ \(-\) │ Apreciación real tras alza de tasa (UIP) │
+├──────────────────────────────┼───────┼──────────────────────────────────────────┤
+│ Tasa de interés (\(i\)) │ \(+\) │ Definición del choque monetario │
+├──────────────────────────────┼───────┼──────────────────────────────────────────┤
+│ Crecimiento M2 │ \(-\) │ Política restrictiva contrae liquidez │
+└──────────────────────────────┴───────┴──────────────────────────────────────────┘ \\
+\end{longtable}
+
+II.4 --- Estrategia 3: Restricciones de Signo Aumentadas --- Algorithm 1
+de C\&E
+
+Motivación: Las restricciones de signo estándar admiten modelos donde la
+inflación responde marginalmente al choque monetario (casi cero), lo
+cual es inconsistente con la elasticidad precio-interés estimada en la
+economía mexicana. C\&E (2015) proponen una cota de elasticidad como
+filtro adicional.
+
+Ecuación 11 --- Bound de elasticidad: A partir de la ecuación de curva
+de Phillips forward-looking restringida:
+
+\[\hat{\beta}^- = \hat{\beta}i + \hat{\beta}{ii}, \qquad \hat{\beta}_{lower} = \hat{\beta}^- - 1.645\cdot\widehat{\text{SE}}(\hat{\beta}^-)\]
+
+donde \(\hat{\beta}i\) y \(\hat{\beta}{ii}\) son coeficientes de la
+regresión de inflación sobre tasa de interés rezagada e interacción. En
+nuestra estimación\\
+(Newey-West, 3 lags):
+
+\[\hat{\beta}^- = -0.400, \quad \widehat{\text{SE}} = 0.192 \quad \Rightarrow \quad \hat{\beta}_{lower} = -0.715\]
+
+Restricción aumentada: Para cada candidato
+\(\mathbf{A}_0 = \mathbf{P}_b\mathbf{Q}\), además de los signos, se
+exige:
+
+\[\hat{\beta}_{lower}\cdot\Delta i ;\leq; \Delta\pi ;\leq; 0\]
+
+donde \(\Delta i = \mathbf{r}{j\text{mp}}\) y
+\(\Delta\pi = \mathbf{r}_2\) son las respuestas de impacto de la tasa y
+la inflación en la columna del choque monetario. En código:
+
+\% SVAR\_SignRestrictions.m --- líneas 307-312 if strcmp(type,
+`augmented') dpi\_imp = resp(2); \% Δπ (inflación core, posición 2)
+di\_imp = resp(j\_mp); \% Δi (tasa de interés, posición 5) if
+beta\_lower\_val * di\_imp \textgreater{} dpi\_imp continue; \%
+rechazar: respuesta de inflación demasiado débil end end
+
+Algorithm 1 (C\&E) --- Descripción completa:
+
+Inputs: Y (T×6), Z (T×3), p=3, B\_boot=2000, K=100, K\_max=5000, h=16
+signs\_mp, β\_lower, j\_mp=5
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Estimar VAR reducido → (B̂, Σ̂\_u, ê\_t) P₀ = chol(Σ̂\_u) ← Cholesky base
+\item
+  Para b = 1,\ldots,2000: 2a. Resamplear residuos (Runkle 1987): idx =
+  randi(T\_eff, T\_eff, 1) ẽ\_b = ê{[}idx, :{]} 2b. Pseudo-datos
+  recursivos: Ỹ\_b = runkle\_bootstrap\_data(B̂, Y, Z, p, ẽ\_b) 2c.
+  Re-estimar VAR en Ỹ\_b → (B̂\_b, Σ̂\_b) P\_b = chol(Σ̂\_b) ← nueva
+  Cholesky del draw
+
+  2d. Para k = 1,\ldots,5000: Q \textasciitilde{} Haar(6×6) ←
+  qr(randn(6)): uniforme en O(6) A₀ = P\_b * Q r = A₀{[}:, j\_mp{]} ←
+  columna del choque monetario
+
+\begin{verbatim}
+Verificar signos:
+  ∀ v: signs_mp[v] ≠ 0  →  signs_mp[v] · r[v] > 0  (o rechazar)
+
+(Solo aumentado) Verificar cota:
+  β_lower · r[j_mp] ≤ r[2]  (o rechazar)
+
+Si pasa: IRF_full = compute_irf(B̂_b, n, p, r, h)
+         Acumular en all_irfs
+Si k_acc ≥ K: salir del loop de candidatos
+\end{verbatim}
+\item
+  Sobre all\_irfs (n\_total × n × h+1): IRF\_mediana = median(all\_irfs,
+  dim=1) IRF\_lo = prctile(all\_irfs, 16, dim=1) IRF\_hi =
+  prctile(all\_irfs, 84, dim=1)
+\end{enumerate}
+
+El número total de modelos aceptados depende de qué tan restrictivas son
+las condiciones: 198,654 para restricciones estándar y 66,874 para
+aumentadas (ratio\\
+\textasciitilde3:1), lo que refleja que la restricción de elasticidad
+rechaza aprox. el 66\% de los candidatos que pasan los signos.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 0\tabcolsep) * \real{0.0556}}@{}}
+\toprule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+III. Principales Diferencias: Replicación vs Paper \\
+┌─────────────────────────┬──────────────────────────┬───────────────────────────┬──────────────────────┬─────────────────────┐
+│ Dimensión │ Paper C\&E │ Replicación │ Magnitud │ Estado │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ \(T\) │ 159 │ 159 │ Exacto │ ✅ Resuelto │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ Rezagos (\(p\)) │ 3 │ 3 │ Exacto │ ✅ │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ Estabilidad VAR │ ✓ │ ✓ │ Exacto │ ✅ │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ \(\hat{\beta}_{lower}\) │ \(-0.700\) │ \(-0.715\) │ \(\Delta=0.015\)
+(\textasciitilde2\%) │ ≈ Concordante │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ TCR socios │ 21 │ 49 (Banxico SR15997) │ Diferente │ ⚠ Fuente de datos
+│
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ Ajuste estacional │ TRAMO/X-12 aditivo │ X-13ARIMA-SEATS │ Metodología
+distinta │ ⚠ Impacto menor │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ Modelos aceptados (std) │ N/D │ 198,654 │ Sin referencia │ --- │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ Producto doméstico │ Brecha precalculada IGAE │ Índice IGAE nivel
+(INEGI) │ Diferente fuente │ ⚠ Resuelto │ │ │ │ │ │ (índice) │
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ IRF signos cualitativos │ Figura 7/8/9 │ Coinciden │ Concordante │ ✅
+│
+├─────────────────────────┼──────────────────────────┼───────────────────────────┼──────────────────────┼─────────────────────┤
+│ Price puzzle │ Eliminado │ Eliminado │ Concordante │ ✅ │
+└─────────────────────────┴──────────────────────────┴───────────────────────────┴──────────────────────┴─────────────────────┘ \\
+Posibles causas de las diferencias cuantitativas en
+\(\hat{\beta}^-\): \\
+1. TRAMO vs X-13: diferencias menores en las series de inflación
+desestacionalizada afectan la regresión de la Ecuación 11 2. TCR
+multilateral vs 49 socios: la composición del índice cambia la dinámica
+de dep\_tcr, afectando los coeficientes
+\(\hat{\beta}i, \hat{\beta}{ii}\) 3. Brecha del producto: C\&E usa la
+brecha IGAE precalculada por Banxico; nosotros extraemos el gap via HP
+del índice nivel, lo que produce una serie con tendencia ligeramente
+distinta \\
+\end{longtable}
+
+\begin{enumerate}
+\def\labelenumi{\Roman{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Problema del Signo del TCR bajo Restricciones de Exclusión
+\end{enumerate}
+
+El problema original
+
+Al inicio de la replicación, las IRFs de Cholesky mostraban que ante un
+choque monetario contractivo (subida de tasa de interés), el TCR se
+depreciaba en horizontes medios. Esto es económicamente incorrecto: por
+la Paridad de Tasas de Interés (UIP):
+
+\[i_t - i_t^* = \mathbb{E}t[e{t+1}] - e_t \quad \Rightarrow \quad \uparrow i \Rightarrow \text{apreciación del peso} \Rightarrow \text{dep_tcr} < 0\]
+
+Causa raíz: definición de TCR en C\&E vs SR15997
+
+C\&E (2015/2018) definen su TCR multilateral siguiendo la convención
+estándar de Banxico en la literatura de los 2000:
+
+\[\text{TCR}_{t}^{\text{C&E}} = \frac{e_t \cdot P_t^*}{P_t}\]
+
+donde un aumento = depreciación real del peso. Bajo esta definición,
+dep\_tcr \textgreater{} 0 significa que el peso se deprecia en términos
+reales.
+
+La serie SR15997 de SIE Banxico (``Índice de tipo de cambio real
+multilateral'') usa la misma orientación: aumento = depreciación. Esta
+es la convención del código:
+
+\% SVAR\_SignRestrictions.m --- línea 18 (comentario de cabecera) \% 4:
+dep\_tcr --- Crecimiento TCR (+ = depreciación)
+
+\% SVAR\_SignRestrictions.m --- línea 127 (restricciones de signo)
+signs\_mp = {[}-1; -1; 0; -1; 1; -1{]}; \% \^{}--- dep\_tcr debe ser
+NEGATIVO (apreciación) tras choque contractivo
+
+La causa del signo erróneo
+
+En versiones previas de la replicación, el código de procesamiento
+calculaba:
+
+\# VERSIÓN INCORRECTA (invertida): dep\_tcr = (log(lag(tcr)) - log(tcr))
+* 1200 \# ← signo invertido
+
+en lugar de:
+
+\# Code/0Proc\_data.R --- línea 185 (VERSIÓN CORRECTA): dep\_tcr =
+(log(tcr) - log(lag(tcr))) * 1200 \# + = depreciación
+
+Con la versión invertida, un aumento en SR15997 (depreciación) producía
+un dep\_tcr negativo, invirtiendo la interpretación. Cuando la IRF de
+Cholesky mostraba\\
+apreciación en horizontes \(h > 0\), la serie registraba eso como un
+valor positivo (porque la tasa de cambio estaba invertida), resultando
+en el signo contrario al esperado en las gráficas.
+
+Cómo está resuelto
+
+En el flujo actual:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  0Proc\_data.R calcula dep\_tcr = (log(tcr) - log(lag(tcr))) * 1200 →
+  convención correcta (positivo = depreciación)
+\item
+  SVAR\_SignRestrictions.m impone signs\_mp(4) = -1 → el choque
+  contractivo debe producir apreciación (dep\_tcr negativo) ✅
+\item
+  Las IRFs de Cholesky (Fig. 7) muestran dep\_tcr que no reacciona en
+  \(h=0\) (por construcción, la variable 4 está antes del choque en la
+  posición 5) y que muestra apreciación en horizontes medios,
+  consistente con la UIP y con la Figura 7 del paper original.
+\end{enumerate}
+
+▎ Nota sobre los 49 vs 21 socios comerciales: aunque este cambio no
+afecta el signo, sí cambia la magnitud de las IRFs del TCR. SR15997
+pondera por comercio total (49 socios); el índice de C\&E pondera los 21
+principales socios de 2001. En ambos casos la apreciación post-choque
+monetario es cualitativa y cuantitativamente\\
+similar.
+
+\end{document}

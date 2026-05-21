@@ -1,0 +1,27 @@
+\frametitle{\S 3 C\'odigo MATLAB: Restricciones de Signo Aumentadas}
+\begin{lstlisting}
+% signs_mp = [-1;-1; 0;-1;+1;-1],  j_mp = 5  (i_gap)
+for b = 1:n_boot
+  for k = 1:K_max
+    % Q ~ Haar(n x n): QR de matriz normal aleatoria
+    [Q, R] = qr(randn(n, n));
+    Q = Q * diag(sign(diag(R)));      % ajuste de signo para uniforme en O(n)
+    A0   = P_b * Q;
+    resp = A0(:, j_mp);               % columna del choque monetario
+
+    % (a) Verificar restricciones de signo estandar
+    valid = all(signs_mp(signs_mp ~= 0) .* resp(signs_mp ~= 0) > 0);
+    if ~valid, continue; end
+
+    % (b) Restriccion aumentada: beta_lower * Delta_i <= Delta_pi
+    if strcmp(type, 'augmented')
+      if beta_lower * resp(j_mp) > resp(2), continue; end
+    end
+
+    % Guardar IRF aceptada (h periodos)
+    irf_full = compute_irf(B0, n, p, resp, h);
+    n_acc = n_acc + 1;
+    all_irfs(n_acc, :, :) = irf_full';
+  end
+end
+\end{lstlisting}

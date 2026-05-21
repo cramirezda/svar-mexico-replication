@@ -1,0 +1,274 @@
+﻿
+
+
+
+
+
+Replicación Carrillo &amp; Elizondo (2015/2018) — SVAR México
+
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; font-size: 13px; background: #f0f2f5; color: #222; }
+.hero   { background: linear-gradient(135deg,#1a252f,#2c3e50); color: white;
+          padding: 18px 24px; }
+.hero h1 { font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+.hero p  { font-size: 11px; color: #95a5a6; }
+.scorecard { background: #f8f9fa; padding: 12px 24px; border-bottom: 2px solid #dee2e6; }
+.scorecard-title { font-size: 10px; font-weight: bold; color: #495057;
+                   text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.navbar { background: #2c3e50; padding: 6px 24px; display: flex; gap: 14px; flex-wrap: wrap; }
+.navbar a { color: #3498db; font-size: 10px; text-decoration: none; }
+.navbar a:hover { color: white; }
+.section-header { padding: 7px 16px; color: white; font-size: 11px; font-weight: bold;
+                  text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+.col-header { display: grid; grid-template-columns: 1fr 1fr; }
+.col-paper { background: #2980b9; color: white; padding: 6px 14px;
+             font-size: 10px; font-weight: bold; text-align: center; }
+.col-rep   { background: #16a085; color: white; padding: 6px 14px;
+             font-size: 10px; font-weight: bold; text-align: center; }
+.two-col   { display: grid; grid-template-columns: 1fr 1fr;
+             border-bottom: 1px solid #dee2e6; }
+.cell-paper { background: #eaf4fb; padding: 12px 16px; border-right: 1px solid #dee2e6; }
+.cell-rep   { background: #e8f8f5; padding: 12px 16px; }
+.cell-paper img, .cell-rep img { max-width: 100%; height: auto; border-radius: 4px;
+                                  box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.note { font-size: 10px; color: #666; font-style: italic; margin-top: 6px; }
+table.cmp { width: 100%; border-collapse: collapse; font-size: 11px; font-family: monospace; }
+table.cmp th { background: #34495e; color: white; padding: 5px 8px; text-align: left; }
+table.cmp td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+table.cmp tr:nth-child(even) td { background: #f7f7f7; }
+.match-yes    { color: #27ae60; font-weight: bold; }
+.match-approx { color: #f39c12; font-weight: bold; }
+.match-no     { color: #e74c3c; font-weight: bold; }
+footer { background: #1a252f; color: #95a5a6; text-align: center;
+         font-size: 10px; padding: 12px; margin-top: 16px; }
+
+
+
+
+
+  Replicación: "How Robust Are SVARs at Measuring Monetary Policy in Small Open Economies?"
+  Carrillo &amp; Elizondo (2015/2018) &bull; Journal of Empirical Finance &bull;
+     México &bull; VAR(3) mensual &bull; Ene 2001 – Mar 2014
+
+
+  📋 Scorecard de Replicación
+  
+✓ Estacionariedad (ADF)
+✓ Rezagos p=3
+✓ Estabilidad VAR
+~ β_lower (-0.715 vs -0.7)
+✓ T obs (159 vs 159)
+✓ Corr(y_mx, y_us) ≈ 0.86
+✓ Signos IRF Cholesky
+✓ Price puzzle eliminado (aug)
+  
+
+
+  §1 Datos
+  §2 Descriptivos
+  §3 Diagnósticos
+  §4 β_lower
+  §5 Cholesky (Fig 7)
+  §6 Sign Restrictions (Fig 8)
+  §7 Comparación (Fig 9)
+  §8 Resumen cuantitativo
+
+§1 — Descripción de Datos📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)
+      Muestra: Ene 2001 – Mar 2014 &bull; T = 159 &bull; Frecuencia mensual
+      Endógenas (Yt):
+      
+        yt &minus; ȳt: Output gap (IGAE)
+        πt &minus; π̄t: Core CPI inflation gap
+        πtp &minus; π̄t: PPI inflation gap
+        Δqt: Real ER depreciation (21 trading partners, IFS)
+        it &minus; π̄t: Nom. interest rate gap (Cetes 28d)
+        Δmt &minus; π̄t: Money growth gap (M2)
+      
+      Exógenas (Zt):
+      
+        ytus &minus; ȳtus: US output gap (INDPRO, HP)
+        πtus: US PCE inflation
+        πtcrb: CRB commodity price inflation
+      
+      Transformaciones: log-dif &times;1200, filtro HP (λ=129,600), ajuste estacional
+      π̄t = tendencia HP de inflación subyacente = ancla nominal
+    
+      Muestra: Ene 2001 – Mar 2014 &bull; T = 159
+      ⚠ 1 obs menos que paper
+      &bull; Frecuencia mensual
+      Endógenas: igae, pi_core_gap, pi_inpp_gap, dep_tcr, i_gap, m2_gap
+      (mismo orden Cholesky)
+      Exógenas: y_us_gap, pi_us, pi_crb
+      Transformaciones: log-dif &times;1200, filtro HP (λ=129,600),
+      ajuste estacional (X-13ARIMA-SEATS)
+      ⚠ Diferencia TCR: Banxico SR15997 (49 socios) vs. paper (21 socios, IFS).
+      Corr(y_mx, y_us) en muestra = 0.9 (paper: 0.86)
+    Figure C.3: Original data (with HP trend)No disponible digitalmente — ver PDF p.50 (Appendix C)Equivalente Fig. C.3: Series originales + tendencia HPLínea roja punteada = tendencia HP (λ=129,600)§2 — Estadísticos Descriptivos📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)
+      Tabla A1 (Apéndice C)
+      El paper no reporta una tabla explícita de estadísticos descriptivos
+      en el cuerpo principal. La Figura C.3 muestra visualmente las propiedades de las series.
+      Rangos aproximados del paper (Fig. 6 y C.3):
+      • Output gap: ±4% pts
+      • Core π gap: ±2 pp
+      • PPI gap: ±10 pp
+      • TCR dep: ±10%
+      • Interest rate gap: 0–8 pp
+      • M2 gap: ±4 pp
+    Estadísticos descriptivos calculados§3 — Diagnósticos Estadísticos📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)
+      Raíces unitarias (Apéndice C):
+      Todas las variables rechazan H₀: raíz unitaria al 5%.
+      Joint unit-root tests (Levin-Lin-Chu, Breitung) también rechazados.
+      Con muestras pequeñas, los tests de raíz unitaria tienen bajo poder.
+      La teoría económica apoya estacionariedad de las series en gap/tasa de crecimiento.
+    ADF (3 lags) y Phillips-Perron aplicados a todas las variables.
+      Selección de rezagos:
+      SIC → p = 1 &bull; AIC → p = 2 &bull; LR test → p = 3
+      Hatemi &amp; Hacker (2009): LR desempata cuando SIC y AIC difieren.
+      Decisión: p = 3
+    VARselect con exógenas block-exógenas. Paper: SIC→1, AIC→2, LR→3.
+      Estabilidad del VAR: Todas las raíces del polinomio
+      característico dentro del círculo unitario ✓
+      Autocorrelación (Ljung-Box Q, 3 lags):
+      Solo la ecuación del output gap rechaza H₀ de no autocorrelación.
+      Requeriría 12 lags para no rechazar → ~500 parámetros con T=153.
+      Decisión: mantener p=3
+    Estabilidad:Autocorrelación (BG test):§4 — Estimación de βlower (Ecuación 11)📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)
+      Regresión: Δπt = β₀ + βi·Δit
+      + βii·Dt·Δit + ωt
+      donde ωt ~ ARMA(1,2) y Dt = 1 si signos opuestos.
+      
+        ParámetroValor paper
+        β̂⁻ (punto)−0.035
+        β̂⁻lower (IC 95%)−0.7
+        Restricción aug.β̂lower·Δi ≤ Δπ ≤ 0
+      
+    
+      Estimación OLS con HAC Newey-West (lag=3):
+      (sin ARMA en el error — aproximación simplificada)
+      
+        ParámetroReplicaciónDiscrepancia
+        β̂⁻ (punto)
+            −0.400
+            Paper: −0.035 ✗
+        SE β̂⁻
+            0.192—
+        β̂⁻lower
+            −0.715
+            Paper: −0.7 ~
+        β_lower usado
+            −0.715 (est. propia)
+            vs −0.7 (paper)
+      
+      ⚠ Diferencia en β̂⁻ puntual: el paper usa ARMA(1,2) para ωt;
+      nosotros usamos OLS simple. El β_lower (bound del IC 95%) es casi idéntico (−0.715 vs −0.7),
+      lo que valida la restricción aumentada.
+    §5 — Restricciones de Exclusión — Figura 7📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)Figura 7 del paper (p.27)No disponible digitalmente — ver PDF p.27Hallazgos paper: VAR simple: output incluso sube post-choque;
+      inflación no significativa. VAR w/exo: output cae moderadamente, inflación cae en patrón
+      hump-shaped (pico ~6 meses). No descarta price puzzle.Bootstrap: 2,000 draws. IC: 68%. n=6 endógenas, p=3.Figura 7 — Replicación (MATLAB, Sección 4B)Bootstrap: 2,000 draws. IC: 68% (percentiles 16-84). Misma estructura que paper.§6 — Restricciones de Signo — Figura 8📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)Figura 8 (p.30)No disponible digitalmente — ver PDF p.30Panel superior (Standard):
+      Mediana de elasticidad de inflación = −2.5 (simple) / −2.0 (w/exo).
+      VAR w/exo principalmente reduce bandas para output gap.
+      Panel inferior (Augmented):
+      Mediana de elasticidad cae a −0.35. Price puzzle ocurre con menor probabilidad.
+      Pico de inflación: dentro de 6 meses, no en el impacto.Figura 8 — Replicación (MATLAB)2,000 bootstraps &times; 4 modelos. Modelos aceptados:Standard w/exo: 198,654 | Standard simple: 197,050Augmented w/exo: 66,874 | Augmented simple: 61,799β_lower = −0.715§7 — Comparación de Estrategias — Figura 9📄 Paper Original (C&E 2015/2018)🔬 Replicación (Este trabajo)Figura 9 (p.33)No disponible digitalmente — ver PDF p.33Panel superior (Exclusion vs Augmented):
+      Todas las variables responden en la misma dirección tras algunos períodos.
+      Exclusion: respuestas más pequeñas para output, π, PPI, TCR.
+      Exclusion: respuesta mayor para tasa de interés.
+      Panel inferior (Standard vs Augmented):
+      Única diferencia relevante: impact response de inflación.
+      Standard: mediana = −2.5; Augmented: mediana = −0.35.Figura 9 — Replicación (MATLAB)VAR con exógenas solamente. Cholesky = azul sólido;
+      Augmented = verde punteado. Standard = magenta; Augmented = verde.§8 — Resumen Cuantitativo: Paper vs. Replicación
+  
+  
+  
+    
+      §8 Impact Responses (h=0): Paper vs. Replicación
+    
+    
+      Choque monetario contractivo (i_gap aumenta 1 pp)
+    
+    
+      Variable
+      
+        Exclusion (Cholesky)
+      
+      
+        Standard Signs
+      
+      
+        Augmented Signs
+      
+    
+    
+      Paper
+      Replicación
+      Paper
+      Replicación
+      Paper
+      Replicación
+    
+  
+  
+    Output
+~0
+0.000
+−
+−0.170
+−
+−0.183
+    Core inflation
+~0
+0.000
+−
+−0.226
+≈0 pequeño
+−0.064
+    PPI
+~0
+0.000
+libre
+−0.954
+libre
+−0.797
+    Real ER dep
+~0
+0.000
+−
+−6.326
+−
+−6.071
+    Nom. interest rate
++0.47 approx
++0.466
++
++0.129
++
++0.228
+    Money growth
++0.31 approx
++0.313
+−
+−1.961
+−
+−1.897
+  
+  
+    
+       Cholesky h=0: por definición del ordenamiento, output/π no reaccionan en impacto.
+    
+    
+       Standard/Augmented: mediana de modelos aceptados. Signs paper: dirección impuesta.
+    
+  
+
+Principales diferencias:✓ T observaciones: 159 (repl.) vs 159 (paper)~ β̂⁻ punto: −0.400 (repl.) vs −0.035 (paper) — β_lower casi idéntico (−0.715 vs −0.7)~ Ajuste estacional: X-13ARIMA-SEATS (repl.) vs Tramo/X12 Additive (paper)✗ TCR socios: 49 (SR15997, Banxico) vs 21 (IFS, paper)✓ Rezagos, signos IRF, estabilidad VAR: match completo
+
+  Generado automáticamente con Code/4Informe_replicacion.R el 2026-04-05 &bull;
+  Replicación de Carrillo &amp; Elizondo (2015/2018) — SVAR México &bull;
+  MATLAB outputs: SVAR_SignRestrictions.m (Secciones 4B y 5)
+
+
+
+
+

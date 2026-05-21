@@ -1,0 +1,77 @@
+<h2>Diseño del Informe de Replicación</h2>
+<p class="subtitle">¿Cómo quieres estructurar la comparación Paper Original vs. Replicación?</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Dos columnas continuas (scroll)</h3>
+      <p>Todo el informe en una sola página con dos columnas permanentes: <strong>Paper C&amp;E (izq.)</strong> vs. <strong>Replicación (der.)</strong>. Secciones separadas por encabezados anchos. Tablas y figuras aparecen lado a lado en cada sección.</p>
+      <div style="margin-top:10px;border:1px solid #ccc;border-radius:6px;overflow:hidden;font-size:11px;">
+        <div style="background:#2c3e50;color:white;padding:6px 10px;font-weight:bold;">SVAR México — Replicación Carrillo &amp; Elizondo (2015)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+          <div style="background:#ecf0f1;padding:6px 8px;border-right:2px solid #3498db;font-size:10px;"><strong>📄 Paper Original</strong><br/>Sección 4, Tabla X, Fig. 7...</div>
+          <div style="background:#fff;padding:6px 8px;font-size:10px;"><strong>🔬 Replicación</strong><br/>Nuestros resultados...</div>
+        </div>
+        <div style="background:#3498db;color:white;padding:4px 8px;font-size:10px;">▶ Pruebas de Estacionariedad</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+          <div style="background:#ecf0f1;padding:5px 8px;font-size:9px;">ADF: igae p&lt;0.01 ✓<br/>Phillips-Perron ✓</div>
+          <div style="background:#fff;padding:5px 8px;font-size:9px;">ADF: igae p&lt;0.01 ✓<br/>Phillips-Perron ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Informe por pestañas (tabbed)</h3>
+      <p>Menú de navegación con pestañas: <em>Datos, Diagnósticos, Cholesky, Restricciones de Signo, Comparación Final</em>. Cada pestaña tiene su sección con tabla resumen arriba y comparación visual abajo.</p>
+      <div style="margin-top:10px;border:1px solid #ccc;border-radius:6px;overflow:hidden;font-size:11px;">
+        <div style="background:#2c3e50;color:white;padding:6px 10px;font-weight:bold;">SVAR México — Replicación</div>
+        <div style="display:flex;background:#34495e;">
+          <div style="padding:5px 10px;background:#3498db;color:white;font-size:10px;cursor:pointer;">📊 Datos</div>
+          <div style="padding:5px 10px;color:#bdc3c7;font-size:10px;">🔬 Diagnósticos</div>
+          <div style="padding:5px 10px;color:#bdc3c7;font-size:10px;">📈 Cholesky</div>
+          <div style="padding:5px 10px;color:#bdc3c7;font-size:10px;">✅ Signos</div>
+          <div style="padding:5px 10px;color:#bdc3c7;font-size:10px;">⚖️ Comparación</div>
+        </div>
+        <div style="padding:8px;background:#fff;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:#ecf0f1;padding:6px;border-radius:4px;font-size:9px;"><strong>Paper:</strong> T=159, ene2001–mar2014<br/>9 variables, p=3</div>
+            <div style="background:#e8f5e9;padding:6px;border-radius:4px;font-size:9px;"><strong>Replicación:</strong> T=158<br/>9 variables, p=3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Dashboard académico expandible</h3>
+      <p>Página única tipo dashboard con acordeones colapsables por sección y un panel de <em>semáforo</em> de diferencias (verde = match, amarillo = cercano, rojo = discrepancia) al inicio para diagnóstico rápido.</p>
+      <div style="margin-top:10px;border:1px solid #ccc;border-radius:6px;overflow:hidden;font-size:11px;">
+        <div style="background:#1a252f;color:white;padding:6px 10px;font-weight:bold;">SVAR México — Replicación C&amp;E 2015</div>
+        <div style="padding:8px;background:#fff;">
+          <div style="font-size:10px;font-weight:bold;margin-bottom:5px;">📋 Scorecard de Replicación</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <span style="background:#2ecc71;color:white;padding:2px 6px;border-radius:10px;font-size:9px;">✓ Estacionariedad</span>
+            <span style="background:#2ecc71;color:white;padding:2px 6px;border-radius:10px;font-size:9px;">✓ Rezagos p=3</span>
+            <span style="background:#f39c12;color:white;padding:2px 6px;border-radius:10px;font-size:9px;">~ β_lower</span>
+            <span style="background:#e74c3c;color:white;padding:2px 6px;border-radius:10px;font-size:9px;">✗ T obs</span>
+          </div>
+          <div style="margin-top:6px;border:1px solid #eee;border-radius:4px;">
+            <div style="padding:5px 8px;background:#f8f9fa;font-size:10px;cursor:pointer;">▶ 1. Procesamiento de Datos</div>
+            <div style="padding:5px 8px;background:#f8f9fa;font-size:10px;cursor:pointer;border-top:1px solid #eee;">▶ 2. Pruebas de Diagnóstico</div>
+            <div style="padding:5px 8px;background:#ecf0f1;font-size:10px;border-top:1px solid #eee;">▼ 3. Cholesky IRFs ← activo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Haz clic en una opción y responde en la terminal. También puedes combinar elementos de varias.</p>

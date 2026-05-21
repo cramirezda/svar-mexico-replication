@@ -1,0 +1,1005 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 18.0
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2023 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Unlimited-user 4-core network, expiring 17 Aug 2026
+Serial number: 501909329153
+  Licensed to: Carlos Fernando Ramiírez Dávia
+               ITAM
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do "C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escrit
+> orio\varras\Code\3SVAR_Mexico.do" 
+
+. /*===========================================================================
+> ===
+>   3SVAR_Mexico.do  — PARTE 1: DIAGNÓSTICOS + CHOLESKY (Figura 7)
+>   Replicación: Carrillo & Elizondo (2015), Sección 4 — México
+> 
+>   Estrategia híbrida:
+>     • Este script: Diagnósticos + Identificación por exclusión (Fig. 7)
+>     • MATLAB script (4SVAR_SignRestrictions.m): Restricciones de signos (Figs
+> . 8-9)
+> 
+>   Orden Cholesky (lento → rápido en ajuste a choques nominales):
+>       1. igae        : Brecha del producto
+>       2. pi_core_gap : Brecha inflación subyacente (CPI core)
+>       3. pi_inpp_gap : Brecha inflación productor (PPI)
+>       4. dep_tcr     : Crecimiento del TCR (+ = depreciación)
+>       5. i_gap       : Brecha tasa de interés nominal  ← CHOQUE
+>       6. m2_gap      : Brecha crecimiento del dinero
+> 
+>   Variables exógenas (block-exógenas — Cushman & Zha 1997):
+>       y_us_gap  pi_us  pi_crb
+> 
+>   Muestra: Enero 2001 – Marzo 2014 | Frecuencia: Mensual | Rezagos: 3
+> 
+>   NOTA TCR: SR15997 (Banxico) = 49 socios comerciales. El paper usa 21.
+>   Convención paper: CAÍDA del índice = APRECIACIÓN del peso.
+>   dep_tcr > 0 → depreciación (coherente con definición estándar).
+> =============================================================================
+> =*/
+. 
+. clear all
+
+. set more off
+
+. set scheme s1mono        // gráficas tipo paper
+
+. 
+. * ── Directorios ────────────────────────────────────────────────────────────
+> ──
+. global wdir `"C:/Users/carlo/OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEX
+> ICO/Escritorio/varras"'
+
+. global ddir "$wdir/raw data"
+
+. global fdir "$wdir/figures"
+
+. global cdir "$wdir/Code"
+
+. 
+. capture mkdir "$fdir"
+
+. cd "$ddir"
+C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escritorio\v
+> arras\raw data
+
+. 
+. /*===========================================================================
+> ===
+>   BLOQUE 0: CARGA Y PREPARACIÓN DE DATOS
+> =============================================================================
+> =*/
+. di as txt _newline "=================================="
+
+==================================
+
+. di as txt "BLOQUE 0: CARGA DE DATOS"
+BLOQUE 0: CARGA DE DATOS
+
+. di as txt "=================================="
+==================================
+
+. 
+. * Importar base procesada en R
+. import excel "database.xlsx", sheet("base") firstrow clear
+(10 vars, 159 obs)
+
+. 
+. * ── Conversión de fecha ───────────────────────────────────────────────────
+. * Intentar primero como string "YYYY-MM-DD"
+. capture confirm string variable date
+
+. if _rc == 0 {
+.     gen double date2 = date(date, "YMD")
+.     drop date
+.     rename date2 date
+. }
+
+. * Si viene como número serial de Excel (días desde 1899-12-30)
+. else {
+.     capture assert date > 36000 & date < 50000
+.     if _rc == 0 gen date = date + td(30dec1899)
+. }
+
+. format date %td
+
+. 
+. * Crear variable de tiempo mensual para tsset
+. gen int t = mofd(date)
+
+. format t %tm
+
+. tsset t, monthly
+
+Time variable: t, 2001m1 to 2014m3
+        Delta: 1 month
+
+. label var t "Fecha"
+
+. 
+. * Forzar numérico en todas las variables
+. foreach v in igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap ///
+>              y_us_gap pi_us pi_crb {
+  2.     capture destring `v', replace force
+  3.     label var `v' "`v'"
+  4. }
+
+. 
+. * Restringir a la muestra del paper
+. keep if tin(2001m1, 2014m3)
+(0 observations deleted)
+
+. 
+. di as txt "Observaciones en muestra: " _N
+Observaciones en muestra: 159
+
+. summarize igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap ///
+>           y_us_gap pi_us pi_crb
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        igae |        159   -.2872439    2.183916  -7.692943   3.534763
+ pi_core_gap |        159   -1.12e-16    .9613957  -2.541897    5.16964
+ pi_inpp_gap |        159    .6918523    3.721247   -9.86571   13.44939
+     dep_tcr |        159    1.177631    27.38995  -99.38147   159.4202
+       i_gap |        159    2.666901    2.181843    .327317   13.28813
+-------------+---------------------------------------------------------
+      m2_gap |        159    6.934212    7.088506  -3.092336   75.01148
+    y_us_gap |        159    7.56e-16    3.317192  -10.68051   6.362459
+       pi_us |        159    1.970191    2.748946  -14.24581   11.52538
+      pi_crb |        159    5.890838    72.34102  -253.5326   251.1236
+
+. 
+. * ── Exportar datos para MATLAB (formato CSV) ──────────────────────────────
+. * MATLAB leerá este CSV directamente (no necesita instalar nada)
+. export delimited using "$ddir/database_for_matlab.csv", ///
+>     delimiter(",") replace
+file C:/Users/carlo/OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO/Escrito
+> rio/varras/raw data/database_for_matlab.csv saved
+
+. di as txt "→ Datos exportados: $ddir/database_for_matlab.csv"
+→ Datos exportados: C:/Users/carlo/OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE
+>  MEXICO/Escritorio/varras/raw data/database_for_matlab.csv
+
+. 
+. /*===========================================================================
+> ===
+>   BLOQUE 1: PRUEBAS DE DIAGNÓSTICO
+>   Incluye: raíz unitaria, selección de rezagos, estabilidad, autocorrelación
+> =============================================================================
+> =*/
+. di as txt _newline "=================================="
+
+==================================
+
+. di as txt "BLOQUE 1: DIAGNÓSTICOS"
+BLOQUE 1: DIAGNÓSTICOS
+
+. di as txt "=================================="
+==================================
+
+. 
+. * ── 1.1 Augmented Dickey-Fuller (HO: raíz unitaria) ─────────────────────
+. di as txt _newline "--- 1.1 ADF Test (HO: raíz unitaria) ---"
+
+--- 1.1 ADF Test (HO: raíz unitaria) ---
+
+. foreach v in igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap ///
+>              y_us_gap pi_us pi_crb {
+  2.     di as txt _newline "  Variable: `v'"
+  3.     quietly dfuller `v', lags(3) regress
+  4.     di as res "  ADF stat = " %8.4f `r(Zt)' "  p-valor aprox.: " ///
+>               cond(`r(Zt)' < -3.45, "< 0.01", cond(`r(Zt)' < -2.89, "< 0.05",
+>  "> 0.05"))
+  5. }
+
+  Variable: igae
+  ADF stat =  -2.7662  p-valor aprox.: > 0.05
+
+  Variable: pi_core_gap
+  ADF stat =  -4.5080  p-valor aprox.: < 0.01
+
+  Variable: pi_inpp_gap
+  ADF stat =  -4.8796  p-valor aprox.: < 0.01
+
+  Variable: dep_tcr
+  ADF stat =  -6.4328  p-valor aprox.: < 0.01
+
+  Variable: i_gap
+  ADF stat =  -4.4166  p-valor aprox.: < 0.01
+
+  Variable: m2_gap
+  ADF stat =  -5.8382  p-valor aprox.: < 0.01
+
+  Variable: y_us_gap
+  ADF stat =  -2.6715  p-valor aprox.: > 0.05
+
+  Variable: pi_us
+  ADF stat =  -5.3378  p-valor aprox.: < 0.01
+
+  Variable: pi_crb
+  ADF stat =  -5.8909  p-valor aprox.: < 0.01
+
+. 
+. * ── 1.2 Phillips-Perron ─────────────────────────────────────────────────
+. di as txt _newline "--- 1.2 Phillips-Perron Test (HO: raíz unitaria) ---"
+
+--- 1.2 Phillips-Perron Test (HO: raíz unitaria) ---
+
+. foreach v in igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap ///
+>              y_us_gap pi_us pi_crb {
+  2.     di as txt _newline "  Variable: `v'"
+  3.     pperron `v', lags(4)
+  4. }
+
+  Variable: igae
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: igae                           Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)         -12.485      -19.993      -13.816      -11.077
+ Z(t)            -2.598       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0933.
+
+  Variable: pi_core_gap
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: pi_core_gap                    Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)        -113.683      -19.993      -13.816      -11.077
+ Z(t)            -9.280       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+  Variable: pi_inpp_gap
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: pi_inpp_gap                    Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)        -120.840      -19.993      -13.816      -11.077
+ Z(t)            -9.606       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+  Variable: dep_tcr
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: dep_tcr                        Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)        -112.950      -19.993      -13.816      -11.077
+ Z(t)            -9.812       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+  Variable: i_gap
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: i_gap                          Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)         -19.584      -19.993      -13.816      -11.077
+ Z(t)            -5.150       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+  Variable: m2_gap
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: m2_gap                         Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)        -169.544      -19.993      -13.816      -11.077
+ Z(t)           -12.624       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+  Variable: y_us_gap
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: y_us_gap                       Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)          -7.899      -19.993      -13.816      -11.077
+ Z(t)            -2.036       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.2710.
+
+  Variable: pi_us
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: pi_us                          Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)         -82.431      -19.993      -13.816      -11.077
+ Z(t)            -7.628       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+  Variable: pi_crb
+
+Phillips–Perron test for unit root       Number of obs   = 158
+Variable: pi_crb                         Newey–West lags =   4
+
+H0: Random walk without drift, d = 0
+
+                                       Dickey–Fuller
+                   Test      -------- critical value ---------
+              statistic           1%           5%          10%
+--------------------------------------------------------------
+ Z(rho)        -123.759      -19.993      -13.816      -11.077
+ Z(t)           -10.113       -3.491       -2.886       -2.576
+--------------------------------------------------------------
+MacKinnon approximate p-value for Z(t) = 0.0000.
+
+. 
+. * ── 1.3 Selección de rezagos ────────────────────────────────────────────
+. di as txt _newline "--- 1.3 Criterios de selección de rezagos (maxlag=6) ---"
+
+--- 1.3 Criterios de selección de rezagos (maxlag=6) ---
+
+. di as txt "    (Paper: SIC→1, AIC→2, LR test desempata → 3 rezagos)"
+    (Paper: SIC→1, AIC→2, LR test desempata → 3 rezagos)
+
+. varsoc igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap, ///
+>     exog(y_us_gap pi_us pi_crb) maxlag(6)
+
+Lag-order selection criteria
+
+   Sample: 2001m7 thru 2014m3                              Number of obs = 153
+  +---------------------------------------------------------------------------+
+  | Lag |    LL      LR      df    p     FPE       AIC      HQIC      SBIC    |
+  |-----+---------------------------------------------------------------------|
+  |   0 | -2301.62                      642432   30.4002   30.5933   30.8756  |
+  |   1 | -2003.26  596.71   36  0.000 20839.2*  26.9707*  27.4535*  28.1591* |
+  |   2 | -1972.83  60.857   36  0.006 22491.8   27.0436    27.816    28.945  |
+  |   3 | -1942.42  60.825   36  0.006 24376.7   27.1166   28.1787   29.7311  |
+  |   4 | -1906.21   72.42   36  0.000 24627.5   27.1139   28.4656   30.4414  |
+  |   5 | -1886.68  39.065   36  0.334 31166.7   27.3291   28.9705   31.3697  |
+  |   6 | -1856.87  59.618*  36  0.008 34799.1     27.41   29.3411   32.1637  |
+  +---------------------------------------------------------------------------+
+   * optimal lag
+   Endogenous: igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap
+    Exogenous: y_us_gap pi_us pi_crb  _cons
+
+. 
+. * ── 1.4 Estimación del VAR(3) para diagnósticos ────────────────────────
+. di as txt _newline "--- 1.4 Estimación VAR(3) con exógenas ---"
+
+--- 1.4 Estimación VAR(3) con exógenas ---
+
+. var igae pi_core_gap pi_inpp_gap dep_tcr i_gap m2_gap, ///
+>     lags(1/3) exog(y_us_gap pi_us pi_crb)
+
+Vector autoregression
+
+Sample: 2001m4 thru 2014m3                      Number of obs     =        156
+Log likelihood =  -1989.984                     AIC               =   27.20492
+FPE            =   26609.25                     HQIC              =   28.25307
+Det(Sigma_ml)  =   4843.301                     SBIC              =   29.78557
+
+Equation           Parms      RMSE     R-sq      chi2     P>chi2
+----------------------------------------------------------------
+igae                 22     .601659   0.9345   2226.299   0.0000
+pi_core_gap          22     .870852   0.2678   57.04532   0.0000
+pi_inpp_gap          22     3.43598   0.2576   54.12786   0.0001
+dep_tcr              22     24.5503   0.3049   68.42065   0.0000
+i_gap                22     .532706   0.9191   1771.472   0.0000
+m2_gap               22     6.23263   0.3369   79.26614   0.0000
+----------------------------------------------------------------
+
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+igae         |
+        igae |
+         L1. |   .6896515   .0841442     8.20   0.000     .5247319    .8545712
+         L2. |   .0996247   .1017703     0.98   0.328    -.0998414    .2990907
+         L3. |  -.0709975    .078968    -0.90   0.369     -.225772     .083777
+             |
+ pi_core_gap |
+         L1. |   .0217901   .0563297     0.39   0.699    -.0886141    .1321943
+         L2. |  -.0309529   .0591939    -0.52   0.601    -.1469708    .0850651
+         L3. |   .0392117    .064487     0.61   0.543    -.0871804    .1656039
+             |
+ pi_inpp_gap |
+         L1. |   .0128178   .0160067     0.80   0.423    -.0185548    .0441904
+         L2. |   .0058398   .0168724     0.35   0.729    -.0272294     .038909
+         L3. |   .0228153   .0163782     1.39   0.164    -.0092853     .054916
+             |
+     dep_tcr |
+         L1. |   .0016598   .0022795     0.73   0.467     -.002808    .0061276
+         L2. |  -.0025491   .0022916    -1.11   0.266    -.0070405    .0019422
+         L3. |  -.0033018   .0021221    -1.56   0.120    -.0074611    .0008576
+             |
+       i_gap |
+         L1. |   -.148239    .095476    -1.55   0.121    -.3353685    .0388906
+         L2. |   .1468757    .135309     1.09   0.278    -.1183252    .4120765
+         L3. |  -.0196079   .0863943    -0.23   0.820    -.1889376    .1497219
+             |
+      m2_gap |
+         L1. |  -.0266691   .0074153    -3.60   0.000    -.0412027   -.0121354
+         L2. |  -.0102594   .0077319    -1.33   0.185    -.0254136    .0048947
+         L3. |   .0010298   .0074984     0.14   0.891    -.0136667    .0157263
+             |
+    y_us_gap |   .1661128   .0364149     4.56   0.000     .0947408    .2374847
+       pi_us |   .0304413   .0222814     1.37   0.172    -.0132294     .074112
+      pi_crb |  -.0000586   .0007943    -0.07   0.941    -.0016154    .0014982
+       _cons |   .1237966   .1125922     1.10   0.272    -.0968801    .3444734
+-------------+----------------------------------------------------------------
+pi_core_gap  |
+        igae |
+         L1. |   .1744212   .1217918     1.43   0.152    -.0642864    .4131287
+         L2. |  -.2669692   .1473041    -1.81   0.070    -.5556799    .0217415
+         L3. |   .2977865   .1142997     2.61   0.009     .0737632    .5218098
+             |
+ pi_core_gap |
+         L1. |   .2375084   .0815326     2.91   0.004     .0777074    .3973095
+         L2. |  -.1390221   .0856783    -1.62   0.105    -.3069485    .0289044
+         L3. |   .1887119   .0933396     2.02   0.043     .0057697     .371654
+             |
+ pi_inpp_gap |
+         L1. |   .0564943   .0231684     2.44   0.015      .011085    .1019035
+         L2. |   .0043715   .0244213     0.18   0.858    -.0434934    .0522365
+         L3. |  -.0293871   .0237061    -1.24   0.215    -.0758501    .0170759
+             |
+     dep_tcr |
+         L1. |  -.0028413   .0032994    -0.86   0.389     -.009308    .0036255
+         L2. |   .0032699   .0033168     0.99   0.324     -.003231    .0097707
+         L3. |   .0034547   .0030716     1.12   0.261    -.0025656     .009475
+             |
+       i_gap |
+         L1. |  -.0672344   .1381937    -0.49   0.627     -.338089    .2036202
+         L2. |   .1343924   .1958487     0.69   0.493    -.2494639    .5182488
+         L3. |  -.0621411   .1250486    -0.50   0.619    -.3072319    .1829497
+             |
+      m2_gap |
+         L1. |  -.0209897    .010733    -1.96   0.051     -.042026    .0000466
+         L2. |   .0045255   .0111912     0.40   0.686    -.0174089    .0264599
+         L3. |  -.0047943   .0108533    -0.44   0.659    -.0260663    .0164777
+             |
+    y_us_gap |  -.1061733   .0527076    -2.01   0.044    -.2094782   -.0028683
+       pi_us |   .0276735   .0322505     0.86   0.391    -.0355363    .0908833
+      pi_crb |  -.0008231   .0011497    -0.72   0.474    -.0030764    .0014302
+       _cons |   .0868607    .162968     0.53   0.594    -.2325507    .4062722
+-------------+----------------------------------------------------------------
+pi_inpp_gap  |
+        igae |
+         L1. |   1.030166    .480534     2.14   0.032     .0883367    1.971996
+         L2. |  -.3955446   .5811936    -0.68   0.496    -1.534663     .743574
+         L3. |  -.4222029   .4509736    -0.94   0.349    -1.306095    .4616891
+             |
+ pi_core_gap |
+         L1. |   .8939689     .32169     2.78   0.005     .2634681     1.52447
+         L2. |  -.3479894    .338047    -1.03   0.303    -1.010549    .3145705
+         L3. |  -.5190604   .3682747    -1.41   0.159    -1.240866    .2027447
+             |
+ pi_inpp_gap |
+         L1. |    .135644   .0914118     1.48   0.138    -.0435198    .3148079
+         L2. |   .0010909   .0963553     0.01   0.991    -.1877621    .1899439
+         L3. |   .1369545   .0935331     1.46   0.143    -.0463671     .320276
+             |
+     dep_tcr |
+         L1. |     .02042   .0130181     1.57   0.117    -.0050949    .0459349
+         L2. |  -.0194884   .0130867    -1.49   0.136    -.0451379     .006161
+         L3. |  -.0133477   .0121192    -1.10   0.271    -.0371009    .0104055
+             |
+       i_gap |
+         L1. |   .1020256   .5452482     0.19   0.852    -.9666412    1.170692
+         L2. |   .4991367   .7727282     0.65   0.518    -1.015383    2.013656
+         L3. |  -.8348672    .493384    -1.69   0.091    -1.801882    .1321476
+             |
+      m2_gap |
+         L1. |  -.0135915   .0423475    -0.32   0.748     -.096591     .069408
+         L2. |   .1170962   .0441554     2.65   0.008     .0305533    .2036391
+         L3. |   .0985513   .0428219     2.30   0.021     .0146219    .1824808
+             |
+    y_us_gap |   -.060685   .2079597    -0.29   0.770    -.4682786    .3469086
+       pi_us |   .1530064   .1272455     1.20   0.229    -.0963901     .402403
+      pi_crb |  -.0042432   .0045361    -0.94   0.350    -.0131338    .0046474
+       _cons |  -.3789055   .6429962    -0.59   0.556    -1.639155    .8813439
+-------------+----------------------------------------------------------------
+dep_tcr      |
+        igae |
+         L1. |  -1.401691   3.433455    -0.41   0.683    -8.131139    5.327758
+         L2. |  -1.173417   4.152676    -0.28   0.778    -9.312513    6.965678
+         L3. |   3.663913   3.222244     1.14   0.256    -2.651568    9.979395
+             |
+ pi_core_gap |
+         L1. |    1.65663   2.298501     0.72   0.471     -2.84835     6.16161
+         L2. |  -2.823187   2.415373    -1.17   0.242    -7.557232    1.910858
+         L3. |  -.2152885   2.631353    -0.08   0.935    -5.372645    4.942068
+             |
+ pi_inpp_gap |
+         L1. |  -1.778005   .6531449    -2.72   0.006    -3.058145   -.4978643
+         L2. |   .0783042   .6884667     0.11   0.909    -1.271066    1.427674
+         L3. |   .8997837   .6683018     1.35   0.178    -.4100638    2.209631
+             |
+     dep_tcr |
+         L1. |   .2869084    .093015     3.08   0.002     .1046023    .4692145
+         L2. |  -.1257024   .0935054    -1.34   0.179    -.3089696    .0575647
+         L3. |  -.1620344   .0865928    -1.87   0.061    -.3317532    .0076844
+             |
+       i_gap |
+         L1. |  -2.894111   3.895843    -0.74   0.458    -10.52982    4.741601
+         L2. |   3.541144   5.521206     0.64   0.521    -7.280222    14.36251
+         L3. |  -3.105182   3.525269    -0.88   0.378    -10.01458    3.804218
+             |
+      m2_gap |
+         L1. |   .7640087   .3025762     2.53   0.012     .1709702    1.357047
+         L2. |   .3096027   .3154937     0.98   0.326    -.3087537     .927959
+         L3. |   .1296795   .3059662     0.42   0.672    -.4700033    .7293623
+             |
+    y_us_gap |  -.2608102   1.485889    -0.18   0.861      -3.1731    2.651479
+       pi_us |   1.217241   .9091793     1.34   0.181    -.5647174      2.9992
+      pi_crb |  -.1352824   .0324108    -4.17   0.000    -.1988064   -.0717583
+       _cons |   -1.20021   4.594261    -0.26   0.794     -10.2048    7.804376
+-------------+----------------------------------------------------------------
+i_gap        |
+        igae |
+         L1. |  -.0627056   .0745009    -0.84   0.400    -.2087246    .0833135
+         L2. |   .0549568   .0901069     0.61   0.542    -.1216495    .2315631
+         L3. |   -.036697   .0699179    -0.52   0.600    -.1737336    .1003395
+             |
+ pi_core_gap |
+         L1. |  -.0020363   .0498741    -0.04   0.967    -.0997876    .0957151
+         L2. |  -.0889273     .05241    -1.70   0.090     -.191649    .0137944
+         L3. |   .0535321   .0570965     0.94   0.348    -.0583749     .165439
+             |
+ pi_inpp_gap |
+         L1. |   .0215747   .0141723     1.52   0.128    -.0062024    .0493519
+         L2. |   -.025508   .0149387    -1.71   0.088    -.0547873    .0037713
+         L3. |    .034145   .0145012     2.35   0.019     .0057232    .0625667
+             |
+     dep_tcr |
+         L1. |  -.0008022   .0020183    -0.40   0.691    -.0047579    .0031536
+         L2. |   .0041459   .0020289     2.04   0.041     .0001693    .0081226
+         L3. |  -.0029917   .0018789    -1.59   0.111    -.0066744    .0006909
+             |
+       i_gap |
+         L1. |   1.031297    .084534    12.20   0.000      .865613     1.19698
+         L2. |  -.1496279    .119802    -1.25   0.212    -.3844355    .0851797
+         L3. |  -.0018732   .0764931    -0.02   0.980     -.151797    .1480505
+             |
+      m2_gap |
+         L1. |   .0013339   .0065655     0.20   0.839    -.0115341     .014202
+         L2. |   .0020334   .0068457     0.30   0.766     -.011384    .0154508
+         L3. |   .0010062    .006639     0.15   0.880     -.012006    .0140184
+             |
+    y_us_gap |   .0518786   .0322416     1.61   0.108    -.0113138     .115071
+       pi_us |   .0125728   .0197278     0.64   0.524     -.026093    .0512387
+      pi_crb |  -.0007271   .0007033    -1.03   0.301    -.0021055    .0006512
+       _cons |   .1713982   .0996886     1.72   0.086    -.0239879    .3667844
+-------------+----------------------------------------------------------------
+m2_gap       |
+        igae |
+         L1. |     .07688   .8716566     0.09   0.930    -1.631536    1.785295
+         L2. |   .2531452   1.054246     0.24   0.810     -1.81314     2.31943
+         L3. |   .3583277    .818036     0.44   0.661    -1.244993    1.961649
+             |
+ pi_core_gap |
+         L1. |   .1100521   .5835241     0.19   0.850    -1.033634    1.253738
+         L2. |  -.5762514   .6131946    -0.94   0.347    -1.778091    .6255879
+         L3. |  -.6535734   .6680256    -0.98   0.328     -1.96288    .6557328
+             |
+ pi_inpp_gap |
+         L1. |  -.3541059   .1658149    -2.14   0.033    -.6790971   -.0291146
+         L2. |   .4423497   .1747821     2.53   0.011     .0997831    .7849164
+         L3. |   .0945608   .1696628     0.56   0.577    -.2379722    .4270938
+             |
+     dep_tcr |
+         L1. |   .0139246   .0236139     0.59   0.555    -.0323578    .0602069
+         L2. |   .0822506   .0237384     3.46   0.001     .0357243    .1287769
+         L3. |  -.0069876   .0219835    -0.32   0.751    -.0500743    .0360992
+             |
+       i_gap |
+         L1. |   1.384279   .9890437     1.40   0.162    -.5542114    3.322769
+         L2. |   -3.81235   1.401677    -2.72   0.007    -6.559587   -1.065113
+         L3. |   3.277099   .8949655     3.66   0.000     1.522999    5.031199
+             |
+      m2_gap |
+         L1. |  -.1149256   .0768155    -1.50   0.135    -.2654812      .03563
+         L2. |  -.0323256   .0800949    -0.40   0.687    -.1893087    .1246575
+         L3. |   .0062832   .0776761     0.08   0.936    -.1459592    .1585256
+             |
+    y_us_gap |  -.3337104    .377225    -0.88   0.376    -1.073058    .4056371
+       pi_us |  -.2419467   .2308147    -1.05   0.295    -.6943353    .2104418
+      pi_crb |      -.007   .0082282    -0.85   0.395     -.023127    .0091269
+       _cons |   5.957826   1.166352     5.11   0.000     3.671817    8.243834
+------------------------------------------------------------------------------
+
+. estimates store var_exo_diag
+
+. 
+. * Estabilidad: raíces del polinomio característico (deben ser < 1)
+. di as txt _newline "--- Estabilidad del VAR: raíces (deben ser < 1) ---"
+
+--- Estabilidad del VAR: raíces (deben ser < 1) ---
+
+. varstable, graph name(varstable_plot, replace)
+
+   Eigenvalue stability condition
+  +----------------------------------------+
+  |        Eigenvalue        |   Modulus   |
+  |--------------------------+-------------|
+  |   .8793358               |   .879336   |
+  |   .7317463 +   .120514i  |   .741604   |
+  |   .7317463 -   .120514i  |   .741604   |
+  |   .6280266 +  .2676602i  |   .682685   |
+  |   .6280266 -  .2676602i  |   .682685   |
+  |  -.2525762 +  .6176348i  |   .667284   |
+  |  -.2525762 -  .6176348i  |   .667284   |
+  |   .1140036 +   .640337i  |   .650406   |
+  |   .1140036 -   .640337i  |   .650406   |
+  |   .3045964 +  .4967762i  |   .582722   |
+  |   .3045964 -  .4967762i  |   .582722   |
+  |  -.3793516 +  .2899608i  |   .477478   |
+  |  -.3793516 -  .2899608i  |   .477478   |
+  |  -.4380453 + .03643737i  |   .439558   |
+  |  -.4380453 - .03643737i  |   .439558   |
+  |  -.1556787 +  .3404797i  |   .374383   |
+  |  -.1556787 -  .3404797i  |   .374383   |
+  |   .2813053               |   .281305   |
+  +----------------------------------------+
+   All the eigenvalues lie inside the unit circle.
+   VAR satisfies stability condition.
+
+. graph export "$fdir/varstable.png", name(varstable_plot) replace
+file C:/Users/carlo/OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE
+    MEXICO/Escritorio/varras/figures/varstable.png saved as PNG format
+
+. 
+. * Test LM de autocorrelación de residuos (hasta lag 12)
+. di as txt _newline "--- Test LM Autocorrelación residuos (hasta lag 12) ---"
+
+--- Test LM Autocorrelación residuos (hasta lag 12) ---
+
+. di as txt "    (HO: sin autocorrelación; no rechazar = residuos ruido blanco)
+> "
+    (HO: sin autocorrelación; no rechazar = residuos ruido blanco)
+
+. varlmar, mlag(12)
+
+   Lagrange-multiplier test
+  +--------------------------------------+
+  | lag  |      chi2    df   Prob > chi2 |
+  |------+-------------------------------|
+  |   1  |   51.8004    36     0.04276   |
+  |   2  |   48.0064    36     0.08703   |
+  |   3  |   37.4294    36     0.40335   |
+  |   4  |   61.3370    36     0.00530   |
+  |   5  |   30.1287    36     0.74338   |
+  |   6  |   31.3755    36     0.68819   |
+  |   7  |   48.8961    36     0.07418   |
+  |   8  |   47.2909    36     0.09865   |
+  |   9  |   45.9181    36     0.12445   |
+  |  10  |   28.0888    36     0.82402   |
+  |  11  |   44.0459    36     0.16781   |
+  |  12  |   40.0029    36     0.29692   |
+  +--------------------------------------+
+   H0: no autocorrelation at lag order
+
+. 
+. * Test de normalidad de residuos (Jarque-Bera)
+. di as txt _newline "--- Test de Normalidad residuos (Jarque-Bera) ---"
+
+--- Test de Normalidad residuos (Jarque-Bera) ---
+
+. varnorm
+
+   Jarque-Bera test
+  +--------------------------------------------------------+
+  |           Equation |            chi2   df  Prob > chi2 |
+  |--------------------+-----------------------------------|
+  |               igae |            0.551   2    0.75913   |
+  |        pi_core_gap |          294.721   2    0.00000   |
+  |        pi_inpp_gap |            7.742   2    0.02083   |
+  |            dep_tcr |            5.209   2    0.07392   |
+  |              i_gap |           89.234   2    0.00000   |
+  |             m2_gap |          1693.526  2    0.00000   |
+  |                ALL |          2090.984 12    0.00000   |
+  +--------------------------------------------------------+
+
+   Skewness test
+  +--------------------------------------------------------+
+  |           Equation | Skewness   chi2   df  Prob > chi2 |
+  |--------------------+-----------------------------------|
+  |               igae | -.05679    0.084   1    0.77213   |
+  |        pi_core_gap |  1.0775   30.187   1    0.00000   |
+  |        pi_inpp_gap |  .14836    0.572   1    0.44936   |
+  |            dep_tcr |  .40891    4.347   1    0.03706   |
+  |              i_gap | -.30287    2.385   1    0.12251   |
+  |             m2_gap |  2.2896  136.296   1    0.00000   |
+  |                ALL |          173.871   6    0.00000   |
+  +--------------------------------------------------------+
+
+   Kurtosis test
+  +--------------------------------------------------------+
+  |           Equation | Kurtosis   chi2   df  Prob > chi2 |
+  |--------------------+-----------------------------------|
+  |               igae |  3.2681    0.467   1    0.49423   |
+  |        pi_core_gap |  9.3795  264.534   1    0.00000   |
+  |        pi_inpp_gap |  4.0503    7.170   1    0.00741   |
+  |            dep_tcr |  3.3642    0.862   1    0.35317   |
+  |              i_gap |  6.6553   86.849   1    0.00000   |
+  |             m2_gap |  18.478  1557.230  1    0.00000   |
+  |                ALL |          1917.113  6    0.00000   |
+  +--------------------------------------------------------+
+
+. 
+. * Prueba de Portmanteau (Q de Ljung-Box)
+. di as txt _newline "--- Test Portmanteau (Ljung-Box Q) ---"
+
+--- Test Portmanteau (Ljung-Box Q) ---
+
+. varwle
+
+   Equation: igae
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |  90.00948     6     0.000    |
+  |   2 |  4.774024     6     0.573    |
+  |   3 |   5.12666     6     0.528    |
+  +------------------------------------+
+
+   Equation: pi_core_gap
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |  23.89016     6     0.001    |
+  |   2 |  7.123766     6     0.310    |
+  |   3 |  13.49749     6     0.036    |
+  +------------------------------------+
+
+   Equation: pi_inpp_gap
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |  24.56939     6     0.000    |
+  |   2 |  10.32036     6     0.112    |
+  |   3 |    11.761     6     0.068    |
+  +------------------------------------+
+
+   Equation: dep_tcr
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |  20.34679     6     0.002    |
+  |   2 |  4.282053     6     0.639    |
+  |   3 |  7.206516     6     0.302    |
+  +------------------------------------+
+
+   Equation: i_gap
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |  181.3994     6     0.000    |
+  |   2 |  10.85618     6     0.093    |
+  |   3 |  8.454962     6     0.207    |
+  +------------------------------------+
+
+   Equation: m2_gap
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |   8.28854     6     0.218    |
+  |   2 |  41.29222     6     0.000    |
+  |   3 |  14.54828     6     0.024    |
+  +------------------------------------+
+
+   Equation: All
+  +------------------------------------+
+  | lag |    chi2      df  Prob > chi2 |
+  |-----+------------------------------|
+  |   1 |  382.3385    36     0.000    |
+  |   2 |  79.91536    36     0.000    |
+  |   3 |  65.40919    36     0.002    |
+  +------------------------------------+
+
+. 
+. /*===========================================================================
+> ===
+>   BLOQUE 2: RESTRICCIONES DE EXCLUSIÓN — MIGRADO A MATLAB
+> 
+>   La identificación por restricciones de exclusión (Cholesky) y la generación
+>   de la Figura 7 fueron migradas al script de MATLAB para unificar el flujo
+>   de estimación de IRFs en un solo entorno junto con las restricciones de sig
+> no.
+> 
+>   → Ver: Code/SVAR_SignRestrictions.m — SECCIÓN 4B y FIGURA 7
+> 
+>   El script MATLAB requiere database_for_matlab.csv (exportado en BLOQUE 0)
+>   y produce fig7_exclusion.pdf / fig7_exclusion.png en la carpeta figures/.
+> =============================================================================
+> =*/
+. di as txt _newline "=================================="
+
+==================================
+
+. di as txt "BLOQUE 2: Migrado a MATLAB"
+BLOQUE 2: Migrado a MATLAB
+
+. di as txt "(Ver SVAR_SignRestrictions.m — SECCIÓN 4B)"
+(Ver SVAR_SignRestrictions.m — SECCIÓN 4B)
+
+. di as txt "=================================="
+==================================
+
+. 
+. /*===========================================================================
+> ===
+>   BLOQUE 3: DIAGNÓSTICO DEL TIPO DE CAMBIO REAL (SR15997)
+> =============================================================================
+> =*/
+. di as txt _newline "=================================="
+
+==================================
+
+. di as txt "BLOQUE 3: DIAGNÓSTICO TCR"
+BLOQUE 3: DIAGNÓSTICO TCR
+
+. di as txt "=================================="
+==================================
+
+. 
+. di as txt _newline "Serie SR15997 (Banxico): TCR multilateral, 49 socios, bas
+> e 1990"
+
+Serie SR15997 (Banxico): TCR multilateral, 49 socios, base 1990
+
+. di as txt "Convención: UN AUMENTO en SR15997 = DEPRECIACIÓN del peso"
+Convención: UN AUMENTO en SR15997 = DEPRECIACIÓN del peso
+
+. di as txt "dep_tcr = Δlog(SR15997)*1200 → valor positivo = DEPRECIACIÓN ✓"
+dep_tcr = Δlog(SR15997)*1200 → valor positivo = DEPRECIACIÓN ✓
+
+. di as txt ""
+
+
+. di as txt "Hipótesis sobre IRF invertida:"
+Hipótesis sobre IRF invertida:
+
+. di as txt "  (a) Diferencia de cobertura: 49 vs 21 socios → posible ruido"
+  (a) Diferencia de cobertura: 49 vs 21 socios → posible ruido
+
+. di as txt "  (b) Diferencia de convención: verificar con correlación abajo"
+  (b) Diferencia de convención: verificar con correlación abajo
+
+. di as txt ""
+
+
+. 
+. * Correlación diagnóstica TCR ~ tasa de interés
+. di as txt "Correlación dep_tcr vs i_gap (debe ser negativa post-choque):"
+Correlación dep_tcr vs i_gap (debe ser negativa post-choque):
+
+. correlate dep_tcr i_gap pi_core_gap
+(obs=159)
+
+             |  dep_tcr    i_gap pi_cor~p
+-------------+---------------------------
+     dep_tcr |   1.0000
+       i_gap |   0.0190   1.0000
+ pi_core_gap |  -0.0576   0.1978   1.0000
+
+
+. 
+. * Estadísticas descriptivas
+. sum dep_tcr, detail
+
+                           dep_tcr
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%    -59.88839      -99.38147
+ 5%    -34.89419      -59.88839
+10%    -28.32453      -55.98075       Obs                 159
+25%    -14.62798      -40.61542       Sum of wgt.         159
+
+50%    -2.054942                      Mean           1.177631
+                        Largest       Std. dev.      27.38995
+75%     15.03236       51.60803
+90%     36.14111       61.49301       Variance       750.2091
+95%     45.78407       67.70813       Skewness       1.107003
+99%     67.70813       159.4202       Kurtosis       9.831397
+
+. 
+. di as txt _newline "Si la IRF del TCR sale con signo opuesto al paper:"
+
+Si la IRF del TCR sale con signo opuesto al paper:
+
+. di as txt "→ Agregar en Bloque 0: replace dep_tcr = -dep_tcr"
+→ Agregar en Bloque 0: replace dep_tcr = -dep_tcr
+
+. di as txt "  (esto invierte la convención del índice)"
+  (esto invierte la convención del índice)
+
+. di as txt ""
+
+
+. di as txt "Para Figuras 8 y 9 (restricciones de signos):"
+Para Figuras 8 y 9 (restricciones de signos):
+
+. di as txt "→ Correr el script MATLAB: Code/4SVAR_SignRestrictions.m"
+→ Correr el script MATLAB: Code/4SVAR_SignRestrictions.m
+
+. di as txt "  El script de MATLAB lee database_for_matlab.csv"
+  El script de MATLAB lee database_for_matlab.csv
+
+. di as txt "  y produce fig8 y fig9 en la carpeta figures/"
+  y produce fig8 y fig9 en la carpeta figures/
+
+. 
+. di as txt _newline "=================================="
+
+==================================
+
+. di as txt "Script completado. Figuras en: $fdir"
+Script completado. Figuras en: C:/Users/carlo/OneDrive - INSTITUTO TECNOLOGICO 
+> AUTONOMO DE MEXICO/Escritorio/varras/figures
+
+. di as txt "=================================="
+==================================
+
+. 
+end of do-file

@@ -1,0 +1,69 @@
+
+===== SECCIÓN 1: CARGA DE DATOS =====
+Muestra: 159 observaciones, 6 variables endógenas, 3 exógenas
+
+--- Estimando VAR Simple ---
+--- Estimando VAR con Exógenas ---
+
+===== SECCIÓN 3: ESTIMACIÓN β_lower (OLS + Newey-West, C&E 2015) =====
+  [PRIMARIO] OLS + Newey-West (lag=3):
+    β̂⁻ puntual (βi+βii) =  -0.4012  (paper: -0.035)
+    SE β̂⁻ (NW)          =   0.1943  (paper implícito: ~0.40)
+    β_lower (IC 95%)   =  -0.7208  (paper: -0.700)
+  [COMPARACIÓN] MLE ARMA(1,2):
+    β̂⁻ puntual (MLE)    =  -0.0163
+    SE β̂⁻ (Hessiano)    =   0.0994
+    β_lower (IC 95%)   =  -0.1798
+    φ1=-0.8276  θ1=0.1470  θ2=-0.7855  σ²=0.783228  exitflag=5
+  → β_lower usado: -0.7208  [método: OLS+NW]
+
+  Exportado: C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escritorio\varras\raw data\beta_lower_arma12.csv
+
+
+===== SECCIÓN 4B: CHOLESKY (FIGURA 7) =====
+   Bootstrap Cholesky — VAR Simple (2000 réplicas, Runkle 1987)...
+   → VAR Simple completado.
+   Bootstrap Cholesky — VAR con exógenas (2000 réplicas, Runkle 1987)...
+   → VAR con exógenas completado.
+
+===== SECCIÓN 5: CORRIENDO MODELOS =====
+
+[A] Standard Sign Restrictions — VAR con exógenas
+    Bootstrap [standard, use_exo=1]: 200..400..600..800..1000..1200..1400..1600..1800..2000.. (198238 modelos aceptados de 2000 draws)
+Elapsed time is 77.382110 seconds.
+
+[B] Standard Sign Restrictions — VAR simple
+    Bootstrap [standard, use_exo=0]: 200..400..600..800..1000..1200..1400..1600..1800..2000.. (196696 modelos aceptados de 2000 draws)
+Elapsed time is 96.049122 seconds.
+
+[C] Augmented Sign Restrictions — VAR con exógenas
+    Bootstrap [augmented, use_exo=1]: 200..400..600..800..1000..1200..1400..1600..1800..2000.. (68531 modelos aceptados de 2000 draws)
+Elapsed time is 71.102647 seconds.
+
+[D] Augmented Sign Restrictions — VAR simple
+    Bootstrap [augmented, use_exo=0]: 200..400..600..800..1000..1200..1400..1600..1800..2000.. (62843 modelos aceptados de 2000 draws)
+Elapsed time is 71.172341 seconds.
+
+===== SECCIÓN 6: GRÁFICAS =====
+→ Figura 7 guardada: C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escritorio\varras\figures\fig7_exclusion.pdf
+→ Figura 8 guardada: C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escritorio\varras\figures\fig8_sign_restrictions.pdf
+→ Figura 9 guardada: C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escritorio\varras\figures\fig9_comparison.pdf
+
+===== SECCIÓN 7: RESUMEN DE RESULTADOS =====
+
+Impacto del choque monetario contractivo (h=0):
+Variable              Exclusion     Std Signs     Aug Signs   
+------------------------------------------------------------
+Output                 +0.0000       -0.1638       -0.1795
+Inflation (core)       +0.0000       -0.2168       -0.0645
+PPI                    +0.0000       -0.8914       -0.7039
+Real ER dep            +0.0000       -6.2411       -5.9801
+Nom. interest rate     +0.4594       +0.1306       +0.2286
+Money growth           +0.2511       -1.8144       -1.7568
+
+(+) = depreciación/aumento, (-) = apreciación/caída
+
+β_lower utilizado: -0.7208 (paper: -0.7)
+
+Todas las figuras guardadas en: C:\Users\carlo\OneDrive - INSTITUTO TECNOLOGICO AUTONOMO DE MEXICO\Escritorio\varras\figures
+Script completado.
