@@ -86,14 +86,12 @@
 \vspace*{2cm}
 
 {\large Instituto Tecnológico Autónomo de México \par}
-\pregunta{¿Va el nombre del curso o seminario en la portada?}
 \vspace{0.5cm}
-{\large Departamento de Economía \par}
+{\large Seminario de Investigación Económica \\ Victoria Nuguer \par}
 \vspace{3cm}
 
-{\LARGE\bfseries ¿Qué tan robustos son los SVARs para medir\\[6pt]
-la política monetaria en México?\\[6pt]
-Una replicación de Carrillo y Elizondo (2015/2018) \par}
+{\LARGE\bfseries How Robust Are SVARs at Measuring Monetary Policy in Small Open Economies?\\[6pt]
+Replicación de Carrillo y Elizondo (2015/2018) \par}
 \vspace{2cm}
 
 {\large Carlos Ramírez \par}
@@ -107,28 +105,18 @@ Una replicación de Carrillo y Elizondo (2015/2018) \par}
 \begin{abstract}
 \noindent Este trabajo replica el ejercicio empírico de \citet{carrilloelizondo2018} para México,
 comparando tres estrategias de identificación en modelos de vectores autorregresivos
-estructurales (SVAR): restricciones de exclusión mediante la descomposición de Cholesky,
-restricciones de signo simples y restricciones de signo aumentadas.
-Utilizando datos mensuales del período enero 2001–marzo 2014
-y un VAR(3) con seis variables endógenas y un bloque de tres variables exógenas,
-se muestra que las tres estrategias convergen cualitativamente en horizontes de seis
-a doce meses: un choque monetario contractivo reduce el producto y la inflación,
+estructurales (SVAR): restricciones de exclusión mediante la descomposición de Cholesky, restricciones de signo simples y restricciones de signo aumentadas.
+Se utilizan datos mensuales del período enero 2001–marzo 2014 y un VAR(3) con seis variables endógenas y un bloque de tres variables exógenas.Se muestra que las tres estrategias convergen cualitativamente en horizontes de seis a doce meses: un choque monetario contractivo reduce el producto y la inflación,
 aprecia el tipo de cambio real y contrae los agregados monetarios.
-La principal diferencia entre esquemas se concentra en la respuesta contemporánea
-de la inflación, donde las restricciones de signo simples producen efectos de impacto
-implausiblemente grandes que las restricciones aumentadas corrigen mediante una cota
-inferior de elasticidad inflación-tasa estimada con datos históricos
-($\blower \approx -0.721$, muy próxima al valor reportado en el paper original de $-0.700$).
+La principal diferencia entre esquemas se concentra en la respuesta contemporánea de la inflación, donde además las restricciones de signo simples producen efectos implausibles de gran impacto, que las restricciones aumentadas corrigen mediante una cota
+inferior de elasticidad inflación\-tasa estimada con datos históricos
+%($\blower \approx -0.721$, muy próxima al valor reportado en el paper original de $-0.700$).
 Los resultados sugieren que las conclusiones cualitativas sobre transmisión
 monetaria en México son robustas a la estrategia de identificación, aunque
 la elección del esquema sí tiene consecuencias cuantitativas notorias en el corto plazo.
 
 \medskip
-\noindent\textbf{Palabras clave:} SVAR, política monetaria, restricciones de signo,
-restricciones de exclusión, México, economía pequeña abierta.
 
-\medskip
-\noindent\textbf{Clasificación JEL:} E52, E58, C32, F41.
 \end{abstract}
 
 \end{titlepage}
@@ -141,33 +129,27 @@ restricciones de exclusión, México, economía pequeña abierta.
 Los vectores autorregresivos estructurales (SVAR, por sus siglas en inglés) constituyen
 la herramienta empírica estándar para cuantificar los efectos de la política monetaria
 sobre la actividad económica y los precios.
-Su popularidad se debe a que permiten combinar la flexibilidad de los modelos de series
+Los SVAR permiten combinar la flexibilidad de los modelos de series
 de tiempo con restricciones teóricamente motivadas que dan contenido económico a los
 choques identificados \citep{sims1980}.
 No obstante, la validez de las conclusiones derivadas de un SVAR depende críticamente
-del esquema de identificación adoptado, y la literatura ha documentado ampliamente que
-distintas estrategias pueden producir resultados cuantitativamente —y en ocasiones
-cualitativamente— distintos para las mismas economías y períodos muestrales
+del esquema de identificación adoptado, y la literatura ha documentado que las
+distintas estrategias pueden producir resultados cuantitativamente distintos para las mismas economías y períodos muestrales
 \citep{faust1998, uhlig2005}.
 
 Este trabajo replica el ejercicio empírico de \citet{carrilloelizondo2018} para México,
 comparando tres estrategias de identificación: (i) restricciones de exclusión mediante
-la descomposición de Cholesky, (ii) restricciones de signo simples sobre el vector de
-respuestas al impacto, y (iii) restricciones de signo aumentadas, que incorporan
+la descomposición de Cholesky, (ii) restricciones de signo y (iii) restricciones de signo aumentadas, que incorporan
 adicionalmente una cota inferior sobre la elasticidad de la inflación con respecto a la
 tasa de interés estimada con datos históricos.
 El período de análisis abarca de enero de 2001 a marzo de 2014, coincidiendo con la
-vigencia del esquema de objetivos de inflación adoptado por el Banco de México,
-y la frecuencia de los datos es mensual.
+vigencia del esquema de objetivos de inflación adoptado por el Banco de México. La frecuencia de los datos es mensual.
 
-México ofrece un caso de estudio relevante por varias razones. Es una economía pequeña
-y abierta cuya política monetaria opera bajo un régimen de metas de inflación, lo que
-facilita la interpretación del choque de política como una perturbación a la tasa de
-Cetes a 28 días. Además, el grado de apertura comercial y financiera implica que las
-variables externas —el ciclo económico de Estados Unidos, la inflación en dólares y los
-precios internacionales de materias primas— tienen una influencia significativa sobre
-las variables domésticas, justificando la incorporación de un bloque exógeno siguiendo a
-\citet{cushmanZha1997}.
+Además, México es un caso de estudio relevante, pues es una economía pequeña y abierta cuya política monetaria opera bajo un régimen de metas de inflación, lo que
+facilita la interpretación del choque de política como una perturbación a la tasa de referencia, que se manifiesta en un ajuste a la tasa de Cetes a 28 días. Además, el grado de apertura comercial y financiera implica que las
+variables externas (el ciclo económico de Estados Unidos, la inflación en dólares y los
+precios internacionales de materias primas) tienen una influencia significativa sobre
+las variables domésticas, lo que justifica la incorporación de un bloque exógeno.
 Trabajos previos han documentado la operación del mecanismo de transmisión en México
 \citep{ramosfranciatorres2005, elizondo2012}, pero sin comparar sistemáticamente
 estrategias de identificación, hueco que \citet{carrilloelizondo2018} cubren y que este
@@ -175,7 +157,6 @@ trabajo verifica.
 
 La pregunta central es si las conclusiones sobre la transmisión del choque monetario son
 robustas a la elección del esquema de identificación.
-\revision{¿Agregar hipótesis explícita aquí, o dejarlo como pregunta de investigación abierta?}
 El análisis muestra que las tres estrategias convergen cualitativamente en horizontes
 de seis a doce meses.
 La principal diferencia se concentra en la respuesta contemporánea de la inflación,
@@ -196,28 +177,20 @@ La sección~\ref{sec:conclusiones} concluye.
 \section{Revisión de Literatura}
 \label{sec:lit}
 
-\subsection{Vectores Autorregresivos Estructurales y la Identificación del Choque Monetario}
+\subsection{SVARs e identificación del choque monetario}
 
-La incorporación de los modelos de vectores autorregresivos al análisis macroeconómico
-empírico se debe a \citet{sims1980}, quien propuso sustituir los grandes modelos
+La incorporación de los modelos VAR en la macroeconomía
+empírica se debe a \citet{sims1980}, quien propuso sustituir los grandes modelos
 estructurales de ecuaciones simultáneas —cuyas restricciones de identificación eran
 frecuentemente cuestionables— por representaciones sin restricciones a priori.
-Para recuperar los efectos dinámicos de choques económicamente interpretables a partir
-de un VAR de forma reducida, es necesario imponer algún esquema de identificación que
-relacione las innovaciones del sistema con perturbaciones estructurales ortogonales.
+Para recuperar los efectos dinámicos de choques económicamente interpretables a partir de un VAR de forma reducida, es necesario imponer algún esquema de identificación que relacione las innovaciones del sistema con perturbaciones estructurales ortogonales.
 En el contexto de la política monetaria, el problema consiste en aislar la respuesta de
-la economía ante una modificación exógena del instrumento del banco central.
+la economía ante un choque exógeno del instrumento del banco central.
 
 La estrategia más extendida ha sido imponer restricciones de exclusión contemporáneas
 mediante la descomposición de Cholesky.
-\citet{bernankeblinder1992} establecieron que la tasa de fondos federales es un buen
-indicador del choque de política monetaria en Estados Unidos.
-\citet{cee1999, cee2005} desarrollaron la especificación con restricciones de exclusión
-que se convirtió en referencia para la literatura: bajo el ordenamiento propuesto,
-las variables reales y de precios se asumen predeterminadas con respecto al instrumento
-de política, mientras que los agregados monetarios reaccionan contemporáneamente.
-Esta jerarquía lento-rápido tiene una motivación económica plausible y produjo
-estimaciones ampliamente replicadas.
+
+\nota{hay que reescribir dos párrafos de esta subsección basándonos en la literatura que recopilaron Carrillo y Elizondo. Checa la sección de literatura del paper.}
 
 \subsection{El \textit{Price Puzzle} y las Limitaciones de las Restricciones de Exclusión}
 
@@ -226,7 +199,7 @@ por un hallazgo empírico que desafía la teoría económica.
 \citet{sims1992} documentó que, bajo la identificación de Cholesky, la inflación tiende
 a \textit{aumentar} en los meses inmediatamente posteriores a un choque monetario
 contractivo, resultado denominado \textit{price puzzle}.
-Una explicación inicial fue que el banco central eleva anticipadamente la tasa en
+Una explicación inicial \todo{Quién dió esta explicación inicial?} fue que el banco central eleva anticipadamente la tasa en
 respuesta a presiones inflacionarias futuras no capturadas en el VAR; al omitirse una
 variable que sintetice la información forward-looking sobre inflación, la política
 monetaria aparece correlacionada positivamente con aumentos futuros de precios.
@@ -238,7 +211,7 @@ del marco de restricciones de exclusión.
 Esta debilidad motivó la búsqueda de estrategias de identificación alternativas que no
 dependan de la especificidad del ordenamiento.
 
-\subsection{Restricciones de Signo: Flexibilidad y Multiplicidad}
+\subsection{Restricciones de signo: flexibilidad y multiplicidad}
 
 Una línea alternativa de investigación propuso abandonar los ceros exactos en favor de
 restricciones sobre el signo de las respuestas al impulso.
@@ -251,20 +224,17 @@ de exclusión, pero también más honestas sobre la identificación parcial del 
 La contribución de \citet{uhlig2005} formalizó este enfoque mediante un procedimiento
 agnóstico: identifica el choque monetario imponiendo solo que la tasa de interés suba,
 la inflación no aumente y los agregados monetarios no crezcan, sin restringir la
-respuesta del producto.
+respuesta del producto. \todo{necesitamos corroborar esto exactamente con una cita textual de Uhlig}
 El resultado fue que los efectos sobre el \textit{output} son considerablemente
 menos precisos de lo que la literatura previa había sugerido.
 \citet{dedolaneri2006} y \citet{mountforduhlig2009} extendieron este marco a choques
-tecnológicos y fiscales, respectivamente, consolidando las restricciones de signo como
-metodología estándar.
+tecnológicos y fiscales, respectivamente, consolidando las restricciones de signo como metodología estándar.
 
 El principal inconveniente es la multiplicidad de modelos admisibles que generan.
 Al rechazar solo los modelos que violan los signos impuestos pero aceptar todos los
 demás, el conjunto de respuestas al impulso coherentes puede ser extraordinariamente
 amplio, incorporando no solo incertidumbre estadística sino también incertidumbre de
-identificación.
-La respuesta de la inflación puede abarcar un rango tan extenso que la restricción de
-signo en sí misma tiene poco contenido informativo.
+identificación. La respuesta de la inflación puede abarcar un rango tan extenso que la restricción designo en sí misma tiene poco contenido informativo.
 
 \subsection{Restricciones de Signo Aumentadas}
 
@@ -281,11 +251,10 @@ admisibles, acerca las medianas de las respuestas al impulso a las obtenidas baj
 Cholesky en horizontes medios y elimina la mayoría de los episodios de \textit{price
 puzzle}.
 
+
 \subsection{Economías Pequeñas Abiertas y Bloque Exogeneidad}
 
-La estimación de SVARs para economías pequeñas abiertas requiere abordar la endogeneidad
-potencial de variables externas que, desde la perspectiva del país pequeño, son
-exógenas.
+La estimación de SVARs para economías pequeñas abiertas requiere abordar la endogeneidad potencial de variables externas que, desde la perspectiva del país pequeño, son exógenas.
 \citet{cushmanZha1997} propusieron incorporar las variables extranjeras como bloque
 exógeno dentro del sistema, de modo que las variables domésticas no retroalimenten a
 las externas por construcción.
@@ -293,21 +262,7 @@ las externas por construcción.
 abiertas genera anomalías adicionales, en particular una depreciación del tipo de cambio
 inmediatamente posterior a un choque contractivo —el \textit{exchange rate puzzle}.
 
-\subsection{Política Monetaria en México}
 
-El Banco de México adoptó formalmente un esquema de objetivos de inflación en 2001,
-lo que delimita el período de análisis relevante para estudiar la transmisión monetaria
-bajo el régimen vigente.
-\citet{ramosfranciatorres2005, ramosfranciatorres2008} documentaron, mediante VAR, que
-los choques de política monetaria generan respuestas significativas sobre la actividad y
-los precios en México, aunque la magnitud es sensible a la especificación del modelo.
-\citet{elizondo2012} ofrece evidencia más reciente sobre el efecto de la política
-monetaria sobre la brecha del producto, concluyendo que el canal de tasa de interés
-opera con rezagos de hasta tres trimestres.
-A pesar de estos avances, la literatura para México no había comparado sistemáticamente
-las tres estrategias de identificación bajo una especificación unificada, hueco que
-\citet{carrilloelizondo2018} cubren y que este trabajo verifica.
-\agregar{¿Conoces papers más recientes sobre PM en México (post-2018) que valga la pena citar aquí para actualizar la revisión?}
 
 % ============================================================
 %  3. DATOS
@@ -329,8 +284,7 @@ identificación de Cholesky.
 En primer lugar, la brecha del producto mexicano se construye a partir del Indicador
 Global de la Actividad Económica (IGAE), ajustado estacionalmente mediante el método
 X-13ARIMA-SEATS; el componente cíclico se extrae mediante un filtro de Kalman de
-ciclo-tendencia local, que evita las distorsiones de punto final del filtro
-Hodrick-Prescott estándar.
+ciclo-tendencia local.
 Las variables de inflación —subyacente ($\pi_t^c$) e inflación al productor
 ($\pi_t^p$)— se construyen como tasas de crecimiento en logaritmos anualizadas
 mediante la transformación $1{,}200 \times \Delta\log(\cdot)$, y sus brechas se calculan
@@ -340,15 +294,13 @@ La brecha de la tasa de interés nominal ($i_{\text{gap},t}$) corresponde a Cete
 días menos la tendencia HP de la inflación subyacente, lo que la convierte en una
 aproximación a la tasa de interés real proxy.
 La depreciación del tipo de cambio real efectivo ($\text{dep}_t$) se calcula como la
-diferencia logarítmica anualizada del índice del Banco de México (serie SR15997, 49
-socios comerciales).
+diferencia logarítmica anualizada del índice del Banco de México con 49
+socios comerciales.
 Finalmente, la brecha del crecimiento de M2 ($m_{\text{gap},t}$) se construye restando
 la tendencia HP de la inflación subyacente al crecimiento nominal del agregado monetario.
 
 \subsection{Variables Exógenas}
 
-El bloque de variables exógenas comprende tres series que capturan las condiciones
-internacionales relevantes para México.
 La brecha del producto de Estados Unidos se calcula como la desviación logarítmica del
 índice de producción industrial (INDPRO, FRED) respecto a su tendencia HP.
 La inflación de Estados Unidos corresponde al índice de precios PCE (FRED).
@@ -357,26 +309,13 @@ Estas variables se tratan como exógenas bajo el supuesto de economía pequeña:
 México no afecta las condiciones globales, pero sí se ve afectado por ellas
 \citep{cushmanZha1997}.
 
-\subsection{Fuentes y Diferencias con el Paper Original}
 
-Las fuentes primarias son el Banco de México para las variables domésticas y la
-Reserva Federal de St.\ Louis (FRED) para las variables externas.
-\revision{Verificar números de serie exactos de Banxico para cada variable (INPC subyacente, M2, Cetes 28d) e incluirlos en una nota al pie o apéndice de datos.}
-Se documentan dos diferencias respecto al paper original que no es posible eliminar
-por falta de disponibilidad de datos.
-Primera, la fuente del tipo de cambio real: el Banco de México (SR15997, 49 socios)
-versus el índice IFS con 21 socios que utiliza el paper.
-Segunda, el método de ajuste estacional: X-13ARIMA-SEATS versus Tramo/X12 Aditivo del
-paper.
-Estas diferencias afectan marginalmente la construcción de las variables, como documenta
-la correlación muestral entre la brecha del producto mexicano y la brecha del producto
-estadounidense ($\rho \approx 0.86$), prácticamente idéntica a la reportada por
-\citet{carrilloelizondo2018}.
+
 
 \subsection{Estadísticos Descriptivos y Pruebas de Raíz Unitaria}
 
 La Figura~\ref{fig:series_originales} presenta las nueve series con sus respectivas
-tendencias HP, y la Figura~\ref{fig:series_gaps} muestra las variables detrended
+tendencias HP, y la Figura~\ref{fig:series_gaps} muestra las variables sin tendencia
 utilizadas en la estimación.
 
 \begin{figure}[H]
