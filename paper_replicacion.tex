@@ -336,34 +336,6 @@ utilizadas en la estimación.
     \label{fig:series_gaps}
 \end{figure}
 
-Las pruebas de Dickey-Fuller aumentado (ADF) y Phillips-Perron (PP) rechazan la
-hipótesis nula de raíz unitaria al 5\% de significancia para todas las series,
-consistente con el diseño de las variables como brechas respecto a tendencias
-estocásticas (Figura~\ref{fig:adf}).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\linewidth]{tabla_adf_pp.png}
-    \caption{Pruebas de raíz unitaria ADF y Phillips-Perron.
-    Los rezagos ADF se seleccionan con el criterio de Ljung-Box (mínimo $k$ con
-    residuos blancos a $p > 0.10$). $H_0$: raíz unitaria.}
-    \label{fig:adf}
-\end{figure}
-
-La selección del número de rezagos se realiza mediante los criterios de Akaike (AIC),
-Schwarz (SIC) y el test de razón de verosimilitud (LR).
-El AIC sugiere $p = 2$, el SIC $p = 1$ y el test LR dirime a favor de $p = 3$,
-que es el valor adoptado en el paper original (Figura~\ref{fig:varsoc}).
-Se sigue la recomendación de \citet{hatemiHacker2009} de usar el LR como criterio de
-desempate cuando AIC y SIC difieren.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.75\linewidth]{tabla_varsoc.png}
-    \caption{Criterios de selección de rezagos del VAR.
-    AIC $\to p=2$; SIC $\to p=1$; test LR $\to p=3$ (decisión final).}
-    \label{fig:varsoc}
-\end{figure}
 
 % ============================================================
 %  4. METODOLOGÍA
@@ -416,6 +388,10 @@ Un modelo $Q$ es aceptado si la respuesta contemporánea satisface las restricci
 signo de la Tabla~\ref{tab:sign_restr}.
 El proceso se repite hasta reunir $K = 100$ modelos aceptados por draw bootstrap,
 con un máximo de $K_{\max} = 5{,}000$ candidatos por draw.
+
+\subsection{Distribución de Haar y algoritmo de implementación}
+
+\todo{Aquí me gustaría que explicaras muy brevemente qué es la distribución de Haar, cómo se llevó a cabo la implementación de esta estrategia (toca checar los informes_tecnicos y la presentacion_replicacion}
 
 \begin{table}[H]
     \centering
@@ -473,12 +449,8 @@ la inflación debe caer al impacto, pero no más de lo que la evidencia históri
 El VAR(3) estimado satisface los requisitos de estabilidad: todas las raíces del
 polinomio característico se encuentran dentro del círculo unitario
 (Figura~\ref{fig:varstable}), garantizando que el sistema es estacionario e invertible.
-El test de Portmanteau (Ljung-Box) sobre los residuos del sistema no rechaza la hipótesis
-nula de no autocorrelación para la mayoría de los rezagos evaluados
-(Figura~\ref{fig:lm}), con la excepción de la ecuación de la brecha del producto para
-rezagos pequeños, resultado que el paper original también documenta y que justifica
-mantener $p = 3$.
 
+\todo{modifica para que se vea bien solo esta figura}
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.45\linewidth}
@@ -488,13 +460,6 @@ mantener $p = 3$.
         \label{fig:varstable}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.52\linewidth}
-        \includegraphics[width=\linewidth]{tabla_lm_norm.png}
-        \caption{Test de Portmanteau (Ljung-Box) sobre residuos del VAR(3).
-        $H_0$: no autocorrelación hasta el rezago $h$.}
-        \label{fig:lm}
-    \end{subfigure}
-    \caption{Diagnósticos del VAR(3).}
 \end{figure}
 
 \subsection{Restricciones de Exclusión (Figura~\ref{fig:fig7})}
@@ -511,7 +476,7 @@ con pico alrededor del sexto mes antes de caer.
 La inclusión de las variables externas resulta, por tanto, cuantitativamente importante:
 reduce la probabilidad del \textit{price puzzle} y acota las bandas de credibilidad
 para la respuesta del producto, confirmando el papel de las variables de información
-forward-looking destacado por \citet{eichenbaum1992} y \citet{hanson2004}.
+forward-looking destacado por \citet{eichenbaum1992} y \citet{hanson2004}. \todo{por favor, reescribe este párrafo, sé más conciso}
 
 \begin{figure}[H]
     \centering
@@ -543,6 +508,7 @@ porcentuales, un resultado que el propio \citet{carrilloelizondo2018} interpreta
 más consistente con la evidencia microeconómica sobre la rigidez nominal de precios.
 Esta es la contribución central del esquema de restricciones aumentadas: proporcionar
 identificación más informativa sin imponer supuestos cualitativos adicionales.
+\todo{reescribe}
 
 \begin{figure}[H]
     \centering
@@ -594,33 +560,6 @@ especificaciones con un fuerte canal de tipo de cambio en el período contempor�
     \label{fig:fig9}
 \end{figure}
 
-\subsection{Resumen Cuantitativo}
-
-La Tabla~\ref{tab:impact} sintetiza las respuestas al impacto ($h = 0$) ante un choque
-monetario contractivo de una desviación estándar bajo los tres esquemas, para el VAR
-con exógenas.
-
-\begin{table}[H]
-    \centering
-    \caption{Respuestas al impacto ($h = 0$): comparación entre estrategias de
-    identificación. VAR con bloque exógeno.
-    Choque: incremento de una desviación estándar en $i_{\text{gap}}$.}
-    \label{tab:impact}
-    \begin{tabular}{lccc}
-        \toprule
-        Variable & Cholesky & Sign. simples & Sign. aumentadas \\
-        \midrule
-        Brecha del producto    & $0.000^*$ & $-0.170$ & $-0.183$ \\
-        Inflación subyacente   & $0.000^*$ & $-0.226$ & $-0.064$ \\
-        Inflación al productor & $0.000^*$ & $-0.954$ & $-0.797$ \\
-        Depreciación TCR       & $0.000^*$ & $-6.326$ & $-6.071$ \\
-        Tasa de interés        & $+0.466$  & $+0.129$ & $+0.228$ \\
-        Crecimiento M2         & $+0.313$  & $-1.961$ & $-1.897$ \\
-        \bottomrule
-        \multicolumn{4}{l}{\footnotesize $^*$ Cero por construcción del ordenamiento Cholesky.}\\
-        \multicolumn{4}{l}{\footnotesize Sign.\ simples y aumentadas: mediana de modelos aceptados.}\\
-    \end{tabular}
-\end{table}
 
 % ============================================================
 %  6. CONCLUSIONES
@@ -651,15 +590,6 @@ propuesto por \citet{carrilloelizondo2018}: proporciona mayor contenido informat
 que las restricciones de signo simples sin la arbitrariedad implícita en las
 restricciones de exclusión.
 
-\eliminar{Revisar si esta sección de conclusiones es suficientemente larga o si el profesor espera mayor discusión de implicaciones de política monetaria.}
-Quedan fuera del alcance de este trabajo varias extensiones.
-El análisis asume linealidad y parámetros constantes en el tiempo, supuesto que podría
-cuestionarse ante el episodio de la crisis de 2008-2009, que cae dentro de la muestra.
-Adicionalmente, las diferencias de fuente en el tipo de cambio real y en el método de
-ajuste estacional introducen discrepancias menores no eliminables.
-Trabajos futuros podrían explorar la robustez de los resultados bajo especificaciones con
-cambio de régimen o con datos de mayor frecuencia que mejor capturen la dinámica de
-corto plazo de la transmisión monetaria en México.
 
 % ============================================================
 %  BIBLIOGRAFÍA
