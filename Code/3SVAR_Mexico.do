@@ -129,6 +129,8 @@ estimates store var_exo_diag
 * Estabilidad: raíces del polinomio característico (deben ser < 1)
 di as txt _newline "--- Estabilidad del VAR: raíces (deben ser < 1) ---"
 varstable, graph name(varstable_plot, replace)
+* Eliminar título automático — se pone desde el .tex via \caption{}
+gr_edit varstable_plot.title.text = {}
 graph export "$fdir/varstable.png", name(varstable_plot) replace
 
 * Test LM de autocorrelación de residuos (hasta lag 12)

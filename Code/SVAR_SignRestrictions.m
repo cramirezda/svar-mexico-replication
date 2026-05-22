@@ -649,8 +649,7 @@ annotation(fig7, 'textbox', [0.68, 0.96, 0.32, 0.04], ...
     'String', '■ Blue = VAR w/ exo   ■ Gray dashed = Simple VAR', ...
     'FontSize', 7.5, 'EdgeColor', 'none');
 
-sgtitle(fig7, 'Figure 7: Exclusion Restrictions — Mexico', ...
-    'FontSize', 11, 'FontWeight', 'bold');
+% sgtitle eliminado — título se pone desde el .tex via \caption{}
 
 exportgraphics(fig7, fullfile(fig_dir, 'fig7_exclusion.pdf'), 'Resolution', 300);
 exportgraphics(fig7, fullfile(fig_dir, 'fig7_exclusion.png'), 'Resolution', 200);
@@ -735,8 +734,7 @@ annotation(fig8, 'textbox', [0.78, 0.96, 0.22, 0.04], ...
     'String', '■ Blue = VAR w/ exo   ■ Gray = Simple VAR', ...
     'FontSize', 7.5, 'EdgeColor', 'none');
 
-sgtitle(fig8, 'Figure 8: Sign Restrictions with Mexican Data', ...
-    'FontSize', 11, 'FontWeight', 'bold');
+% sgtitle eliminado — título se pone desde el .tex via \caption{}
 
 % Exportar
 exportgraphics(fig8, fullfile(fig_dir, 'fig8_sign_restrictions.pdf'), 'Resolution', 300);
@@ -823,8 +821,7 @@ annotation(fig9, 'textbox', [0.68, 0.96, 0.32, 0.04], ...
     'Blue=Exclusion/Standard  |  Green dotted=Augmented Signs', ...
     'FontSize', 7.5, 'EdgeColor', 'none');
 
-sgtitle(fig9, 'Figure 9: Comparison of Identifying Assumptions — VAR w/ Exo', ...
-    'FontSize', 11, 'FontWeight', 'bold');
+% sgtitle eliminado — título se pone desde el .tex via \caption{}
 
 % Exportar
 exportgraphics(fig9, fullfile(fig_dir, 'fig9_comparison.pdf'), 'Resolution', 300);

@@ -151,10 +151,8 @@ p9 <- panel_orig(raw2, "pi_crb_raw",  NULL,          "CRB commodity inflation","
 
 fig_orig <- (p1 | p2 | p3) / (p4 | p5 | p6) / (p7 | p8 | p9) +
   plot_annotation(
-    title   = "Figure C.3 equivalent: Original data with HP trends",
-    caption = "Dashed red = HP trend (λ=129,600). Blue = observed series.",
-    theme   = theme(plot.title   = element_text(size = 10, face = "bold"),
-                    plot.caption = element_text(size = 7))
+    caption = "Línea roja punteada = tendencia HP (λ=129,600). Línea azul = serie observada.",
+    theme   = theme(plot.caption = element_text(size = 7))
   )
 
 ggsave(file.path(fig_dir, "fig_series_originales.png"),
@@ -179,8 +177,7 @@ fig_gaps <- ggplot(db_long, aes(x = date, y = value)) +
   geom_hline(yintercept = 0, color = "gray50", linewidth = 0.3) +
   geom_line(color = "#2166ac", linewidth = 0.5) +
   facet_wrap(~ variable, scales = "free_y", ncol = 3) +
-  labs(title = "Figure 6 equivalent: Detrended data used in estimations",
-       x = NULL, y = "Deviation from trend") +
+  labs(x = NULL, y = "Desviación respecto a tendencia") +
   theme_bw(base_size = 8) +
   theme(strip.text       = element_text(size = 7, face = "bold"),
         axis.text        = element_text(size = 6),
@@ -236,44 +233,33 @@ all_vars <- c(endo_vars, exo_vars)
 adf_res <- lapply(all_vars, function(v) {
   x    <- db[[v]][!is.na(db[[v]])]
   k    <- select_lags_lb(x)
-  res  <- ur.df(x, type = "drift", lags = k)
-  tau2 <- res@teststat[1, "tau2"]
-  cv5  <- res@cval["tau2", "5pct"]
-  lb_p <- Box.test(residuals(res@testreg), lag = 12, type = "Ljung-Box")$p.value
-  pp   <- PP.test(x, lshort = TRUE)
-  adf_dec <- ifelse(tau2 < cv5, "Estacionaria", "Raíz unitaria")
-  pp_dec  <- ifelse(pp$p.value < 0.05, "Estacionaria", "Raíz unitaria")
+  # ADF con p-valor via tseries::adf.test (mismo nro. de rezagos seleccionados)
+  adf_r    <- tseries::adf.test(x, k = k)
+  pp       <- PP.test(x, lshort = TRUE)
+  # Renombrar igae → y_mx_gap solo para presentación en tabla
+  var_label <- ifelse(v == "igae", "y_mx_gap", v)
   data.frame(
-    Variable = v,
+    Variable = var_label,
     ADF_lags = k,
-    ADF_stat = round(tau2,        3),
-    ADF_cv5  = round(cv5,         2),
-    LB12_p   = round(lb_p,        3),
-    ADF_dec  = adf_dec,
-    PP_stat  = round(pp$statistic,3),
-    PP_pval  = round(pp$p.value,  4),
-    PP_dec   = pp_dec,
+    ADF_stat = round(as.numeric(adf_r$statistic), 3),
+    ADF_pval = round(adf_r$p.value,               4),
+    PP_stat  = round(pp$statistic,                 3),
+    PP_pval  = round(pp$p.value,                   4),
     stringsAsFactors = FALSE
   )
 })
 adf_df <- do.call(rbind, adf_res)
 
 tab_adf <- gt(adf_df) %>%
-  tab_header(title    = "Unit Root Tests",
-             subtitle = "ADF (urca, lags adaptivos LB-criterion) + Phillips-Perron | H₀: raíz unitaria") %>%
-  tab_spanner(label = "ADF Test (drift, lags LB-seleccionados)", columns = 2:6) %>%
-  tab_spanner(label = "Phillips-Perron",                          columns = 7:9) %>%
-  cols_label(ADF_lags = "k", ADF_stat = "τ₂", ADF_cv5 = "cv 5%",
-             LB12_p = "LB(12) p", ADF_dec = "Decisión",
-             PP_stat = "Estadístico", PP_pval = "p-valor", PP_dec = "Decisión") %>%
+  tab_spanner(label = "ADF test",            columns = 2:4) %>%
+  tab_spanner(label = "Phillips Perron test", columns = 5:6) %>%
+  cols_label(ADF_lags = "Rezagos",
+             ADF_stat = "Estadístico", ADF_pval = "p-valor",
+             PP_stat  = "Estadístico", PP_pval  = "p-valor") %>%
   tab_style(style = cell_fill(color = "#c8e6c9"),
-            locations = cells_body(rows = ADF_dec == "Estacionaria")) %>%
+            locations = cells_body(rows = ADF_pval < 0.05)) %>%
   tab_style(style = cell_fill(color = "#ffcdd2"),
-            locations = cells_body(rows = ADF_dec != "Estacionaria")) %>%
-  tab_footnote(
-    footnote = "k = mínimo rezago con LB(12) p > 0.10 (residuos blancos). igae y y_us_gap requieren k=4 por alta persistencia.",
-    locations = cells_column_labels(columns = ADF_lags)
-  ) %>%
+            locations = cells_body(rows = ADF_pval >= 0.05)) %>%
   tab_options(table.font.size = "10px")
 
 gtsave(tab_adf, file.path(fig_dir, "tabla_adf_pp.png"), zoom = 1.5)
