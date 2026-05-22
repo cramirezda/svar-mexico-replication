@@ -60,6 +60,30 @@ nz     = size(Z, 2);% número de exógenas
 
 fprintf('Muestra: %d observaciones, %d variables endógenas, %d exógenas\n', T, n, nz);
 
+%% ── DIAGNÓSTICO DE ESCALA Y TEST DE NORMALIZACIÓN ───────────────────────────
+% dep_tcr usa ×1200 (% anual); el paper C&E usa ×100 (% mensual).
+% Ratio P[dep_tcr]/P[i_gap] = ~40 en nuestra versión; debería ser ~1-3.
+% Si test_tcr_monthly=true: dep_tcr ÷ 12 → % mensual → P[dep_tcr] ≈ 1.7
+% Evaluar si esto corrige la forma del IRF de output gap (Figs. 8-9).
+%
+% NOTA: beta_lower NO se ve afectado (usa solo Y(:,2) y Y(:,5)).
+% NOTA: Cambio permanente requiere modificar 0Proc_data.R (dep_tcr ×100).
+test_tcr_monthly = true;   % <══ CAMBIAR A true PARA EJECUTAR EL TEST
+fig_suffix = '';
+if test_tcr_monthly
+    Y(:, 4) = Y(:, 4) / 12;
+    fig_suffix = '_test_monthly';
+    fprintf('  [TEST ESCALA] dep_tcr dividido por 12 (tasa mensual %%/mes)\n');
+    fprintf('  dep_tcr nuevo: sd=%.4f  min=%.4f  max=%.4f\n', ...
+            std(Y(:,4)), min(Y(:,4)), max(Y(:,4)));
+end
+
+fprintf('\n--- Diagnóstico de escala por variable ---\n');
+for vi = 1:n
+    fprintf('  %-15s  sd=%8.4f\n', endo_names{vi}, std(Y(:,vi)));
+end
+fprintf('\n');
+
 %% ============================================================================
 %  SECCIÓN 2: ESTIMACIÓN DEL VAR(3) — MÁX. VEROSIMILITUD (OLS por ecuación)
 %  Modelos: (a) Simple VAR, (b) VAR con exógenas
@@ -546,6 +570,16 @@ fprintf('   → VAR con exógenas completado.\n');
 %% ============================================================================
 fprintf('\n===== SECCIÓN 5: CORRIENDO MODELOS =====\n');
 
+% ── Diagnóstico P diagonal (choque de impacto por variable) ──────────────────
+[~, Sigma_diag, ~, ~] = estimate_var(Y, Z, p, 1);
+P_diag = chol(Sigma_diag, 'lower');
+fprintf('--- P diagonal (SD innovaciones con exógenas) ---\n');
+for vi = 1:n
+    fprintf('  %-15s  P[%d,%d] = %8.4f\n', endo_names{vi}, vi, vi, P_diag(vi,vi));
+end
+fprintf('  Ratio P[dep_tcr]/P[i_gap] = %.2f  (paper: ≈ 3–5)\n\n', ...
+        P_diag(4,4) / P_diag(5,5));
+
 fprintf('\n[A] Standard Sign Restrictions — VAR con exógenas\n');
 tic;
 [irf_std_exo_med, irf_std_exo_lo, irf_std_exo_hi] = ...
@@ -737,9 +771,9 @@ annotation(fig8, 'textbox', [0.78, 0.96, 0.22, 0.04], ...
 % sgtitle eliminado — título se pone desde el .tex via \caption{}
 
 % Exportar
-exportgraphics(fig8, fullfile(fig_dir, 'fig8_sign_restrictions.pdf'), 'Resolution', 300);
-exportgraphics(fig8, fullfile(fig_dir, 'fig8_sign_restrictions.png'), 'Resolution', 200);
-fprintf('→ Figura 8 guardada: %s\n', fullfile(fig_dir, 'fig8_sign_restrictions.pdf'));
+exportgraphics(fig8, fullfile(fig_dir, ['fig8_sign_restrictions' fig_suffix '.pdf']), 'Resolution', 300);
+exportgraphics(fig8, fullfile(fig_dir, ['fig8_sign_restrictions' fig_suffix '.png']), 'Resolution', 200);
+fprintf('→ Figura 8 guardada: %s\n', fullfile(fig_dir, ['fig8_sign_restrictions' fig_suffix '.pdf']));
 
 %% ── FIGURA 9: Comparación entre estrategias (VAR w/ exo solamente) ─────────
 % Top panel:    Exclusion (Cholesky) vs Augmented sign restrictions
@@ -824,9 +858,9 @@ annotation(fig9, 'textbox', [0.68, 0.96, 0.32, 0.04], ...
 % sgtitle eliminado — título se pone desde el .tex via \caption{}
 
 % Exportar
-exportgraphics(fig9, fullfile(fig_dir, 'fig9_comparison.pdf'), 'Resolution', 300);
-exportgraphics(fig9, fullfile(fig_dir, 'fig9_comparison.png'), 'Resolution', 200);
-fprintf('→ Figura 9 guardada: %s\n', fullfile(fig_dir, 'fig9_comparison.pdf'));
+exportgraphics(fig9, fullfile(fig_dir, ['fig9_comparison' fig_suffix '.pdf']), 'Resolution', 300);
+exportgraphics(fig9, fullfile(fig_dir, ['fig9_comparison' fig_suffix '.png']), 'Resolution', 200);
+fprintf('→ Figura 9 guardada: %s\n', fullfile(fig_dir, ['fig9_comparison' fig_suffix '.pdf']));
 
 %% ============================================================================
 %  SECCIÓN 7: RESUMEN NUMÉRICO

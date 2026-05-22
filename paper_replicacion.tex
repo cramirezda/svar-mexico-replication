@@ -78,8 +78,7 @@
 %  PORTADA
 % ============================================================
 % ── Lista de pendientes (aparece en página propia antes de la portada) ──────────
-\listoftodos[Pendientes y anotaciones]
-\newpage
+
 
 \begin{titlepage}
 \centering
@@ -91,12 +90,12 @@
 \vspace{3cm}
 
 {\LARGE\bfseries How Robust Are SVARs at Measuring Monetary Policy in Small Open Economies?\\[6pt]
-Replicación de Carrillo y Elizondo (2015/2018) \par}
+Replicación de Carrillo y Elizondo (2015--18) \par}
 \vspace{2cm}
 
-{\large Carlos Ramírez \par}
+{\large Carlos Fernando Ramírez Dávila \par}
 \vspace{0.5cm}
-{\normalsize \texttt{carlos.ramir5285@gmail.com} \par}
+{\normalsize \texttt{ } \par}
 \vspace{2cm}
 
 {\normalsize Mayo 2026 \par}
@@ -189,20 +188,35 @@ la economía ante un choque exógeno del instrumento del banco central.
 
 La estrategia más extendida ha sido imponer restricciones de exclusión contemporáneas
 mediante la descomposición de Cholesky.
+\citet{bernankeblinder1992} establecieron que la tasa de fondos federales es un buen
+indicador del choque de política monetaria en Estados Unidos, y trabajos posteriores
+como \citet{cee1999, cee2005} consolidaron la especificación recursiva como referencia
+de la literatura: bajo el ordenamiento lento-rápido, las variables reales y de precios
+se asumen predeterminadas respecto al instrumento de política, mientras que los
+agregados monetarios y financieros reaccionan de manera contemporánea.
 
-\nota{hay que reescribir dos párrafos de esta subsección basándonos en la literatura que recopilaron Carrillo y Elizondo. Checa la sección de literatura del paper.}
+Frente a esta tradición, \citet{faust1998} y \citet{canovadenicolo2002} mostraron que
+la imposición de ceros en la matriz de impacto es arbitraria y motivaron una segunda
+generación de esquemas basados en restricciones de signo, que permiten que todas las
+variables endógenas respondan en el período del impacto y solo restringen el signo de
+esas respuestas. \citet{carrilloelizondo2018} resumen así la dicotomía entre ambas
+tradiciones y la trasladan al caso de una economía pequeña abierta como la mexicana,
+contexto en el que las restricciones de exclusión han sido empleadas por
+\citet{cushmanZha1997} para Canadá y por trabajos posteriores para otros países, mientras
+que las restricciones de signo y sus extensiones han recibido aplicaciones más recientes.
 
-\subsection{El \textit{Price Puzzle} y las Limitaciones de las Restricciones de Exclusión}
+\subsection{El \textit{price puzzle} y las limitaciones de las restricciones de exclusión}
 
 A pesar de su popularidad, las restricciones de exclusión han sido objeto de crítica
 por un hallazgo empírico que desafía la teoría económica.
 \citet{sims1992} documentó que, bajo la identificación de Cholesky, la inflación tiende
 a \textit{aumentar} en los meses inmediatamente posteriores a un choque monetario
 contractivo, resultado denominado \textit{price puzzle}.
-Una explicación inicial \todo{Quién dió esta explicación inicial?} fue que el banco central eleva anticipadamente la tasa en
-respuesta a presiones inflacionarias futuras no capturadas en el VAR; al omitirse una
-variable que sintetice la información forward-looking sobre inflación, la política
-monetaria aparece correlacionada positivamente con aumentos futuros de precios.
+El propio \citet{sims1992} ofreció una explicación inicial: el banco central eleva
+anticipadamente la tasa en respuesta a presiones inflacionarias futuras no capturadas
+en el VAR; al omitirse una variable que sintetice la información \textit{forward-looking}
+sobre inflación, la política monetaria aparece correlacionada positivamente con
+aumentos futuros de precios.
 \citet{eichenbaum1992} mostró que incluir el índice de precios de materias primas
 reduce sustancialmente el puzzle.
 No obstante, \citet{hanson2004} demostró que el problema persiste incluso tras controlar
@@ -211,7 +225,7 @@ del marco de restricciones de exclusión.
 Esta debilidad motivó la búsqueda de estrategias de identificación alternativas que no
 dependan de la especificidad del ordenamiento.
 
-\subsection{Restricciones de signo: flexibilidad y multiplicidad}
+\subsection{Restricciones de signo}
 
 Una línea alternativa de investigación propuso abandonar los ceros exactos en favor de
 restricciones sobre el signo de las respuestas al impulso.
@@ -222,9 +236,11 @@ sustancialmente diferentes.
 signo generan bandas de incertidumbre considerablemente más amplias que las restricciones
 de exclusión, pero también más honestas sobre la identificación parcial del modelo.
 La contribución de \citet{uhlig2005} formalizó este enfoque mediante un procedimiento
-agnóstico: identifica el choque monetario imponiendo solo que la tasa de interés suba,
-la inflación no aumente y los agregados monetarios no crezcan, sin restringir la
-respuesta del producto. \todo{necesitamos corroborar esto exactamente con una cita textual de Uhlig}
+agnóstico. En sus propias palabras, un choque monetario contractivo se identifica como
+``a shock such that the federal funds rate does not decrease, prices do not increase
+and nonborrowed reserves do not increase for $k = 0,\ldots,K$ periods following the
+shock'', dejando explícitamente sin restringir la respuesta del producto
+(Uhlig, 2005, p.\ 386).
 El resultado fue que los efectos sobre el \textit{output} son considerablemente
 menos precisos de lo que la literatura previa había sugerido.
 \citet{dedolaneri2006} y \citet{mountforduhlig2009} extendieron este marco a choques
@@ -236,7 +252,7 @@ demás, el conjunto de respuestas al impulso coherentes puede ser extraordinaria
 amplio, incorporando no solo incertidumbre estadística sino también incertidumbre de
 identificación. La respuesta de la inflación puede abarcar un rango tan extenso que la restricción designo en sí misma tiene poco contenido informativo.
 
-\subsection{Restricciones de Signo Aumentadas}
+\subsection{Restricciones de signo aumentadas}
 
 \citet{carrilloelizondo2018} proponen una extensión que incorpora información cuantitativa
 sobre la relación empírica entre inflación y tasa de interés para reducir el conjunto de
@@ -252,7 +268,7 @@ Cholesky en horizontes medios y elimina la mayoría de los episodios de \textit{
 puzzle}.
 
 
-\subsection{Economías Pequeñas Abiertas y Bloque Exogeneidad}
+\subsection{Economías pequeñas abiertas y bloque exogeneidad}
 
 La estimación de SVARs para economías pequeñas abiertas requiere abordar la endogeneidad potencial de variables externas que, desde la perspectiva del país pequeño, son exógenas.
 \citet{cushmanZha1997} propusieron incorporar las variables extranjeras como bloque
@@ -277,7 +293,7 @@ La muestra cubre íntegramente el régimen de objetivos de inflación del Banco 
 y excluye el período posterior a 2014, en el que diversas perturbaciones estructurales
 introducirían dinámicas difíciles de modelar en el marco lineal del SVAR.
 
-\subsection{Variables Endógenas}
+\subsection{Variables endógenas}
 
 El sistema incluye seis variables endógenas ordenadas de lento a rápido para la
 identificación de Cholesky.
@@ -299,7 +315,7 @@ socios comerciales.
 Finalmente, la brecha del crecimiento de M2 ($m_{\text{gap},t}$) se construye restando
 la tendencia HP de la inflación subyacente al crecimiento nominal del agregado monetario.
 
-\subsection{Variables Exógenas}
+\subsection{Variables exógenas}
 
 La brecha del producto de Estados Unidos se calcula como la desviación logarítmica del
 índice de producción industrial (INDPRO, FRED) respecto a su tendencia HP.
@@ -312,7 +328,7 @@ México no afecta las condiciones globales, pero sí se ve afectado por ellas
 
 
 
-\subsection{Estadísticos Descriptivos y Pruebas de Raíz Unitaria}
+\subsection{Estadísticos descriptivos}
 
 La Figura~\ref{fig:series_originales} presenta las nueve series con sus respectivas
 tendencias HP, y la Figura~\ref{fig:series_gaps} muestra las variables sin tendencia
@@ -351,8 +367,8 @@ $\Zt = (y^{us}_t,\, \pi^{us}_t,\, \pi^{crb}_t)'$
 el bloque de variables exógenas.
 El VAR(3) de forma reducida se escribe como:
 \begin{equation}
-    \Yt = \mathbf{c} + \mathbf{A}_1 \Yt_{-1} + \mathbf{A}_2 \Yt_{-2}
-         + \mathbf{A}_3 \Yt_{-3} + \mathbf{B}\Zt + \ut,
+    \Yt = \mathbf{c} + \mathbf{A}_1 \mathbf{Y}_{t-1} + \mathbf{A}_2 \mathbf{Y}_{t-2}
+         + \mathbf{A}_3 \mathbf{Y}_{t-3} + \mathbf{B}\Zt + \ut,
     \label{eq:var}
 \end{equation}
 donde $\mathbf{c}$ es un vector de constantes, $\mathbf{A}_j$ son matrices de
@@ -364,7 +380,7 @@ Las bandas de incertidumbre se obtienen por el bootstrap de \citet{runkle1987}
 con 2,000 réplicas, re-estimando el VAR en cada draw, con intervalos de credibilidad
 al 68\% (percentiles 16 y 84).
 
-\subsection{Restricciones de Exclusión (Cholesky)}
+\subsection{Restricciones de exclusión (Cholesky)}
 
 La descomposición de Cholesky de la matriz de covarianza $\boldsymbol{\Sigma} = PP'$
 identifica el choque monetario como la quinta innovación estructural, correspondiente
@@ -376,7 +392,7 @@ no reaccionan contemporáneamente al choque monetario.
 Se estiman dos versiones: el VAR simple (sin variables exógenas) y el VAR con bloque
 exógeno, para aislar la contribución de las variables externas.
 
-\subsection{Restricciones de Signo Simples}
+\subsection{Restricciones de signo}
 
 El segundo esquema sigue el procedimiento de \citet{uhlig2005}.
 En cada iteración del bootstrap, se genera una matriz ortogonal $Q$ aleatoria con la
@@ -391,7 +407,24 @@ con un máximo de $K_{\max} = 5{,}000$ candidatos por draw.
 
 \subsection{Distribución de Haar y algoritmo de implementación}
 
-\todo{Aquí me gustaría que explicaras muy brevemente qué es la distribución de Haar, cómo se llevó a cabo la implementación de esta estrategia (toca checar los informes_tecnicos y la presentacion_replicacion}
+La matriz $Q$ del párrafo anterior se extrae de la distribución uniforme sobre el grupo
+ortogonal $O(6)$, conocida como medida de Haar. Esta es la única distribución de
+probabilidad sobre $O(n)$ invariante bajo multiplicación por elementos del propio grupo,
+de modo que garantiza un muestreo no informativo del conjunto de rotaciones admisibles.
+En la práctica se construye con una descomposición $QR$ de una matriz $Z$ con entradas
+i.i.d.\ $\mathcal{N}(0,1)$: si $Z = Q R$, entonces el producto
+$Q \cdot \mathrm{diag}(\mathrm{sgn}(\mathrm{diag}(R)))$ se distribuye uniformemente sobre
+$O(n)$ \citep[véase][]{mountforduhlig2009}.
+
+La implementación en este ejercicio de replicación sigue exactamente este
+procedimiento. En cada draw $b$ del bootstrap de \citet{runkle1987} se calcula la
+descomposición de Cholesky $P_b$ de $\widehat{\boldsymbol{\Sigma}}^{(b)}$ y se generan hasta
+$K_{\max} = 5{,}000$ candidatos $Q$; para cada uno se forma $\mathbf{A}_0 = P_b Q$, se
+extrae la quinta columna como vector de impacto del choque monetario y se verifica que
+respete los signos de la Tabla~\ref{tab:sign_restr} (y, en el esquema aumentado, también
+la cota $\blower$). El procedimiento se detiene al acumular $K = 100$ modelos aceptados
+por draw, lo que garantiza que la mediana de las respuestas no esté dominada por
+realizaciones aisladas de $Q$.
 
 \begin{table}[H]
     \centering
@@ -413,7 +446,7 @@ con un máximo de $K_{\max} = 5{,}000$ candidatos por draw.
     \end{tabular}
 \end{table}
 
-\subsection{Restricciones de Signo Aumentadas}
+\subsection{Restricciones de signo aumentadas}
 
 El tercer esquema incorpora una restricción adicional sobre la magnitud de la
 respuesta contemporánea de la inflación, siguiendo a \citet{carrilloelizondo2018}.
@@ -450,33 +483,23 @@ El VAR(3) estimado satisface los requisitos de estabilidad: todas las raíces de
 polinomio característico se encuentran dentro del círculo unitario
 (Figura~\ref{fig:varstable}), garantizando que el sistema es estacionario e invertible.
 
-\todo{modifica para que se vea bien solo esta figura}
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.45\linewidth}
-        \includegraphics[width=\linewidth]{varstable.png}
-        \caption{Raíces del polinomio característico.
-        Todas dentro del círculo unitario.}
-        \label{fig:varstable}
-    \end{subfigure}
-    \hfill
+    \includegraphics[width=0.55\linewidth]{varstable.png}
+    \caption{Raíces del polinomio característico del VAR(3).
+    Todas dentro del círculo unitario.}
+    \label{fig:varstable}
 \end{figure}
 
-\subsection{Restricciones de Exclusión (Figura~\ref{fig:fig7})}
+\subsection{Restricciones de exclusión (Figura~\ref{fig:fig7})}
 
-La Figura~\ref{fig:fig7} presenta las funciones de impulso-respuesta ante un choque
-monetario contractivo bajo el esquema Cholesky, para el VAR simple y el VAR con bloque
-exógeno, con bandas de credibilidad al 68\%.
-En el VAR simple, la respuesta del producto es débil e imprecisa en los primeros meses,
-con un episodio de \textit{price puzzle} leve: la inflación tiende a subir en el
-impacto antes de corregirse, patrón que el paper original también reporta.
-Bajo el VAR con exógenas, la brecha del producto cae gradualmente hasta un mínimo
-alrededor del décimo mes, y la inflación subyacente exhibe un patrón hump-shaped
-con pico alrededor del sexto mes antes de caer.
-La inclusión de las variables externas resulta, por tanto, cuantitativamente importante:
-reduce la probabilidad del \textit{price puzzle} y acota las bandas de credibilidad
-para la respuesta del producto, confirmando el papel de las variables de información
-forward-looking destacado por \citet{eichenbaum1992} y \citet{hanson2004}. \todo{por favor, reescribe este párrafo, sé más conciso}
+La Figura~\ref{fig:fig7} muestra las funciones de impulso-respuesta a un choque monetario
+contractivo bajo Cholesky, con bandas de credibilidad al 68\%. En el VAR simple, la
+respuesta del producto es débil e imprecisa y se observa un \textit{price puzzle} leve,
+patrón que el paper original también reporta. La inclusión del bloque exógeno acota las
+bandas del producto, mitiga el puzzle y produce un perfil \textit{hump-shaped} con pico
+alrededor del sexto mes, en línea con el papel de la información \textit{forward-looking}
+señalado por \citet{eichenbaum1992} y \citet{hanson2004}.
 
 \begin{figure}[H]
     \centering
@@ -488,27 +511,22 @@ forward-looking destacado por \citet{eichenbaum1992} y \citet{hanson2004}. \todo
     \label{fig:fig7}
 \end{figure}
 
-\subsection{Restricciones de Signo Simples y Aumentadas (Figura~\ref{fig:fig8})}
+\subsection{Restricciones de signo simples y aumentadas (Figura~\ref{fig:fig8})}
 
-La Figura~\ref{fig:fig8} reporta las medianas de las funciones de impulso-respuesta
-bajo las cuatro variantes de restricciones de signo: estándar y aumentada, con y sin
-bloque exógeno.
-El contraste más notable se observa en la respuesta contemporánea de la inflación
-subyacente.
-Bajo restricciones simples, la inflación cae en el impacto aproximadamente
-$-0.226$ puntos porcentuales anualizados, una magnitud considerablemente mayor a la
-sugerida por la elasticidad histórica $\pi$-$i$.
-Este resultado refleja el problema de multiplicidad propio de las restricciones de
-signo: el espacio de modelos admisibles incluye especificaciones con elasticidades
-implausiblemente grandes, y la mediana del conjunto acepta esas respuestas extremas.
+La Figura~\ref{fig:fig8} reporta las medianas de las funciones de impulso-respuesta bajo
+las cuatro variantes de restricciones de signo (estándar y aumentada, con y sin bloque
+exógeno). El contraste principal aparece en la respuesta contemporánea de la inflación
+subyacente: con restricciones simples cae en el impacto aproximadamente $-0.226$ puntos
+porcentuales anualizados, magnitud que excede claramente la sugerida por la elasticidad
+histórica $\pi$-$i$. La razón es la multiplicidad de modelos admisibles: el conjunto
+incluye especificaciones con elasticidades implausiblemente grandes y la mediana hereda
+esas respuestas extremas.
 
-Bajo restricciones aumentadas, la cota $\blower = -0.721$ elimina los modelos con
-respuestas excesivas, y la inflación de impacto se reduce a $-0.064$ puntos
-porcentuales, un resultado que el propio \citet{carrilloelizondo2018} interpreta como
-más consistente con la evidencia microeconómica sobre la rigidez nominal de precios.
-Esta es la contribución central del esquema de restricciones aumentadas: proporcionar
-identificación más informativa sin imponer supuestos cualitativos adicionales.
-\todo{reescribe}
+La cota $\blower = -0.721$ descarta esos modelos y reduce la inflación de impacto a
+$-0.064$ puntos porcentuales, valor que \citet{carrilloelizondo2018} interpretan como
+más coherente con la evidencia microeconómica de rigidez nominal. Esta es la
+contribución central del esquema aumentado: identificación más informativa sin imponer
+restricciones cualitativas adicionales.
 
 \begin{figure}[H]
     \centering
@@ -522,7 +540,7 @@ identificación más informativa sin imponer supuestos cualitativos adicionales.
     \label{fig:fig8}
 \end{figure}
 
-\subsection{Comparación entre Estrategias (Figura~\ref{fig:fig9})}
+\subsection{Comparación entre estrategias (Figura~\ref{fig:fig9})}
 
 La Figura~\ref{fig:fig9} superpone las funciones de impulso-respuesta de las tres
 estrategias de identificación para el VAR con exógenas.
